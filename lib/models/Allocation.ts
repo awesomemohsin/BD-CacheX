@@ -7,6 +7,7 @@ const AllocationSchema = new Schema(
     cacheProviderId: { type: Schema.Types.ObjectId, ref: 'CacheProvider', required: true },
     serverId: { type: Schema.Types.ObjectId, ref: 'Server', required: true },
     capacityGB: { type: Number, required: true },
+    serverCount: { type: Number, default: 1, required: true },
     goLiveDate: { type: Date, required: true },
     status: { type: String, enum: Object.values(StatusType), default: StatusType.ACTIVE, required: true },
     notes: { type: String },

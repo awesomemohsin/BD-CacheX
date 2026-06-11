@@ -71,6 +71,7 @@ export interface Allocation {
   serverId: string;
   serverName: string;
   capacityGB: number;
+  serverCount: number;
   goLiveDate: Date;
   status: StatusType;
   notes?: string;
