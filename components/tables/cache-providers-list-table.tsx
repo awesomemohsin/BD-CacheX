@@ -147,15 +147,11 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
                        {provider.shortCode}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-700 text-center font-medium">
-                    <div className="font-semibold">Total: {provider.serverCount ?? 0}</div>
-                    <div className="text-xs text-slate-500">Used: {provider.usedServerCount ?? 0}</div>
-                    <div className="text-xs text-green-600 font-semibold">Free: {Math.max(0, (provider.serverCount ?? 0) - (provider.usedServerCount ?? 0))}</div>
+                  <td className="px-6 py-4 text-sm text-slate-700 text-center font-semibold">
+                    {provider.serverCount ?? 0} pcs
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-700 text-right font-medium">
-                    <div className="font-semibold">Total: {formatCapacity(provider.totalCapacity ?? 0)}</div>
-                    <div className="text-xs text-slate-500">Used: {formatCapacity(provider.usedCapacity ?? 0)}</div>
-                    <div className="text-xs text-green-600 font-semibold">Free: {formatCapacity(Math.max(0, (provider.totalCapacity ?? 0) - (provider.usedCapacity ?? 0)))}</div>
+                  <td className="px-6 py-4 text-sm text-slate-700 text-right font-semibold">
+                    {formatCapacity(provider.totalCapacity ?? 0)}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     {provider.description || '-'}

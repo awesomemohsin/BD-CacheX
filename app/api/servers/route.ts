@@ -18,6 +18,10 @@ export async function POST(request: Request) {
   try {
     await dbConnect();
     const body = await request.json();
+    
+    // Ensure used capacity is calculated dynamically, strip user input
+    delete body.usedCapacityGB;
+
     const userEmail = await logActivity(request, 'CREATE', 'Server', `Created server: ${body.brand} - ${body.model} - ${body.name}`);
     const server = await Server.create({
       ...body,

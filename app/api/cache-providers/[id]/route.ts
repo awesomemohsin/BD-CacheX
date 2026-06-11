@@ -12,6 +12,13 @@ export async function PUT(
     await dbConnect();
     const { id } = await params;
     const body = await request.json();
+    
+    // Ensure stats are computed dynamically, strip user input
+    delete body.serverCount;
+    delete body.totalCapacity;
+    delete body.usedServerCount;
+    delete body.usedCapacity;
+
     const oldProvider = await CacheProvider.findById(id);
     if (!oldProvider) {
       return NextResponse.json({ success: false, error: 'Provider not found' }, { status: 404 });

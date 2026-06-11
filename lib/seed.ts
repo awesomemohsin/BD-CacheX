@@ -106,8 +106,13 @@ export async function seedDatabase() {
       const providersList = await CacheProvider.find({});
       for (const cp of providersList) {
         const activeAllocations = await Allocation.find({ cacheProviderId: cp._id, status: 'Active' });
-        cp.usedServerCount = activeAllocations.length;
-        cp.usedCapacity = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+        const serverCount = activeAllocations.reduce((sum, a) => sum + (a.serverCount || 1), 0);
+        const totalCapacity = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+        
+        cp.serverCount = serverCount;
+        cp.totalCapacity = totalCapacity;
+        cp.usedServerCount = serverCount;
+        cp.usedCapacity = totalCapacity;
         await cp.save();
       }
       console.log('Recalculated server count and capacity for all cache providers.');

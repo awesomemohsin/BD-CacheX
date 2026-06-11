@@ -95,9 +95,6 @@ export function ServerForm({
     if (!formData.totalCapacityGB || formData.totalCapacityGB <= 0) {
       newErrors.totalCapacityGB = 'Total capacity must be greater than 0';
     }
-    if ((formData.usedCapacityGB || 0) > (formData.totalCapacityGB || 0)) {
-      newErrors.usedCapacityGB = 'Used capacity cannot exceed total capacity';
-    }
     if (!formData.location?.trim()) newErrors.location = 'Location is required';
     if (!formData.ipAddress?.trim()) {
       newErrors.ipAddress = 'IP address is required';
@@ -259,42 +256,22 @@ export function ServerForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Total Capacity (GB) *
-          </label>
-          <Input
-            type="number"
-            value={formData.totalCapacityGB || ''}
-            onChange={(e) =>
-              handleChange('totalCapacityGB', parseInt(e.target.value) || 0)
-            }
-            placeholder="5000"
-            className={errors.totalCapacityGB ? 'border-red-500' : ''}
-          />
-          {errors.totalCapacityGB && (
-            <p className="text-xs text-red-600">{errors.totalCapacityGB}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Used Capacity (GB)
-          </label>
-          <Input
-            type="number"
-            value={formData.usedCapacityGB || ''}
-            onChange={(e) =>
-              handleChange('usedCapacityGB', parseInt(e.target.value) || 0)
-            }
-            placeholder="0"
-            className={errors.usedCapacityGB ? 'border-red-500' : ''}
-          />
-          {errors.usedCapacityGB && (
-            <p className="text-xs text-red-600">{errors.usedCapacityGB}</p>
-          )}
-        </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">
+          Total Capacity (GB) *
+        </label>
+        <Input
+          type="number"
+          value={formData.totalCapacityGB || ''}
+          onChange={(e) =>
+            handleChange('totalCapacityGB', parseInt(e.target.value) || 0)
+          }
+          placeholder="5000"
+          className={errors.totalCapacityGB ? 'border-red-500' : ''}
+        />
+        {errors.totalCapacityGB && (
+          <p className="text-xs text-red-650">{errors.totalCapacityGB}</p>
+        )}
       </div>
 
       <div className="space-y-2">

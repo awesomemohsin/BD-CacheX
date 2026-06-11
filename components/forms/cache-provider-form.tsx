@@ -46,12 +46,6 @@ export function CacheProviderForm({
     if (formData.shortCode && formData.shortCode.length > 20) {
       newErrors.shortCode = 'Short code must be 20 characters or less';
     }
-    if (formData.serverCount !== undefined && formData.serverCount < 0) {
-      newErrors.serverCount = 'Server count must be 0 or greater';
-    }
-    if (formData.totalCapacity !== undefined && formData.totalCapacity < 0) {
-      newErrors.totalCapacity = 'Total capacity must be 0 or greater';
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -101,36 +95,6 @@ export function CacheProviderForm({
         {errors.shortCode && (
           <p className="text-xs text-red-650">{errors.shortCode}</p>
         )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Server Count
-          </label>
-          <Input
-            type="number"
-            value={formData.serverCount !== undefined ? formData.serverCount : ''}
-            onChange={(e) => handleChange('serverCount', parseInt(e.target.value) || 0)}
-            placeholder="0"
-            className={errors.serverCount ? 'border-red-500' : ''}
-          />
-          {errors.serverCount && <p className="text-xs text-red-650">{errors.serverCount}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Total Capacity (GB)
-          </label>
-          <Input
-            type="number"
-            value={formData.totalCapacity !== undefined ? formData.totalCapacity : ''}
-            onChange={(e) => handleChange('totalCapacity', parseFloat(e.target.value) || 0)}
-            placeholder="0"
-            className={errors.totalCapacity ? 'border-red-500' : ''}
-          />
-          {errors.totalCapacity && <p className="text-xs text-red-650">{errors.totalCapacity}</p>}
-        </div>
       </div>
 
       <div className="space-y-2">

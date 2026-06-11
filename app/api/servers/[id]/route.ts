@@ -12,6 +12,10 @@ export async function PUT(
     await dbConnect();
     const { id } = await params;
     const body = await request.json();
+    
+    // Ensure used capacity is calculated dynamically, strip user input
+    delete body.usedCapacityGB;
+
     const oldServer = await Server.findById(id);
     if (!oldServer) {
       return NextResponse.json({ success: false, error: 'Server not found' }, { status: 404 });

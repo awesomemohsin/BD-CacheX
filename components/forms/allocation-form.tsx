@@ -298,16 +298,11 @@ export function AllocationForm({
           <SelectContent>
             {cacheProviders.map((provider) => {
               const totalCap = provider.totalCapacity ?? 0;
-              const usedCap = provider.usedCapacity ?? 0;
-              const freeCap = Math.max(0, totalCap - usedCap);
-
               const totalSrv = provider.serverCount ?? 0;
-              const usedSrv = provider.usedServerCount ?? 0;
-              const freeSrv = Math.max(0, totalSrv - usedSrv);
 
               return (
                 <SelectItem key={provider.id} value={provider.id}>
-                  {provider.shortCode} - {provider.name} (Free: {formatCapacity(freeCap)} / Qty: {freeSrv} | Original: {formatCapacity(totalCap)} / Qty: {totalSrv})
+                  {provider.shortCode} - {provider.name} (Qty: {totalSrv} pcs | Capacity: {formatCapacity(totalCap)})
                 </SelectItem>
               );
             })}

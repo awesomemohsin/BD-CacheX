@@ -60,45 +60,27 @@ export function CacheProviderDetailsModal({
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {/* Capacity Box */}
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <div className="flex items-center gap-2 text-slate-800 font-semibold text-sm mb-3">
-              <Database className="w-4 h-4 text-blue-600" />
-              <span>Storage Capacity</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Original</p>
-                <p className="text-xs font-bold text-slate-800 mt-1">{formatCapacity(totalCap)}</p>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                <Database className="w-5 h-5" />
               </div>
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Used</p>
-                <p className="text-xs font-bold text-red-650 mt-1">{formatCapacity(usedCap)}</p>
-              </div>
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Free</p>
-                <p className="text-xs font-bold text-green-600 mt-1">{formatCapacity(freeCap)}</p>
+              <div>
+                <p className="text-[10px] text-slate-500 uppercase font-semibold">Storage Capacity</p>
+                <p className="text-lg font-bold text-slate-900 mt-0.5">{formatCapacity(totalCap)}</p>
               </div>
             </div>
           </div>
 
           {/* Servers Box */}
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <div className="flex items-center gap-2 text-slate-800 font-semibold text-sm mb-3">
-              <Server className="w-4 h-4 text-blue-600" />
-              <span>Servers Quantity</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Original</p>
-                <p className="text-xs font-bold text-slate-800 mt-1">{totalSrv} pcs</p>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                <Server className="w-5 h-5" />
               </div>
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Used</p>
-                <p className="text-xs font-bold text-red-650 mt-1">{usedSrv} pcs</p>
-              </div>
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Free</p>
-                <p className="text-xs font-bold text-green-600 mt-1">{freeSrv} pcs</p>
+              <div>
+                <p className="text-[10px] text-slate-500 uppercase font-semibold">Servers Quantity</p>
+                <p className="text-lg font-bold text-slate-900 mt-0.5">{totalSrv} pcs</p>
               </div>
             </div>
           </div>

@@ -18,6 +18,13 @@ export async function POST(request: Request) {
   try {
     await dbConnect();
     const body = await request.json();
+    
+    // Ensure stats are computed dynamically, strip user input
+    delete body.serverCount;
+    delete body.totalCapacity;
+    delete body.usedServerCount;
+    delete body.usedCapacity;
+
     const userEmail = await logActivity(request, 'CREATE', 'CacheProvider', `Created cache provider: ${body.shortCode} - ${body.name}`);
     const provider = await CacheProvider.create({
       ...body,
