@@ -5,12 +5,17 @@ import { PageHeader } from '@/components/shared/page-header';
 import { CompaniesTable } from '@/components/tables/companies-table';
 import { ServersTable } from '@/components/tables/servers-table';
 import { AllocationsTable } from '@/components/tables/allocations-table';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
 import { calculateCapacityPercentage } from '@/lib/utils';
 import { Database, Server, Building2, Zap, Network } from 'lucide-react';
 
 export default function DashboardPage() {
+  useEffect(() => {
+    document.title = 'Dashboard | BD CacheX';
+  }, []);
+
   const { data: companies = [], isLoading: loadingComp } = useSWR<any[]>('/api/companies', fetcher);
   const { data: cacheProviders = [], isLoading: loadingCp } = useSWR<any[]>('/api/cache-providers', fetcher);
   const { data: servers = [], isLoading: loadingSrv } = useSWR<any[]>('/api/servers', fetcher);
@@ -49,43 +54,50 @@ export default function DashboardPage() {
           label="Total Capacity"
           value={`${totalCapacity} GB`}
           subtext={`${usedCapacity} GB used`}
+          href="/dashboard/servers"
         />
         <StatCard
           icon={Server}
           label="Active Servers"
           value={activeServers}
           subtext={`of ${servers.length} total`}
+          href="/dashboard/servers"
         />
         <StatCard
           icon={Building2}
           label="Connected Companies"
           value={activeCompanies}
           subtext={`of ${companies.length} total`}
+          href="/dashboard/companies"
         />
         <StatCard
           icon={Zap}
           label="Cache Providers"
           value={cacheProviders.length}
           subtext="Active partners"
+          href="/dashboard/cache-providers"
         />
         <StatCard
           icon={Network}
           label="Active Distributions"
           value={activeAllocations}
           subtext={`of ${allocations.length} total`}
+          href="/dashboard/allocations"
         />
       </div>
 
       {/* Data Tables Section */}
       <div className="space-y-8">
-        {/* Companies Table */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-100/30 overflow-hidden hover:shadow-md transition-shadow duration-300">
-          <CompaniesTable />
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Companies Table */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-100/30 overflow-hidden hover:shadow-md transition-shadow duration-300">
+            <CompaniesTable />
+          </div>
 
-        {/* Servers Table */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-100/30 overflow-hidden hover:shadow-md transition-shadow duration-300">
-          <ServersTable />
+          {/* Servers Table */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-100/30 overflow-hidden hover:shadow-md transition-shadow duration-300">
+            <ServersTable />
+          </div>
         </div>
 
         {/* Distribution Table */}
@@ -98,7 +110,7 @@ export default function DashboardPage() {
               Live monitoring of cache capacity distributions across CDN edge servers
             </p>
           </div>
-          <AllocationsTable />
+          <AllocationsTable isDashboard={true} />
         </div>
       </div>
     </div>
