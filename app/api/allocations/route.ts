@@ -2,12 +2,26 @@ import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
 import { Allocation } from '@/lib/models/Allocation';
 import { Server } from '@/lib/models/Server';
+import { CacheProvider } from '@/lib/models/CacheProvider';
+import { Company } from '@/lib/models/Company';
+import { logActivity } from '@/lib/logging';
 
 async function updateServerUsedCapacity(serverId: any) {
   if (!serverId) return;
   const allocations = await Allocation.find({ serverId, status: 'Active' });
   const usedCapacity = allocations.reduce((sum, alloc) => sum + alloc.capacityGB, 0);
   await Server.findByIdAndUpdate(serverId, { usedCapacityGB: usedCapacity });
+}
+
+async function updateCacheProviderStats(cacheProviderId: any) {
+  if (!cacheProviderId) return;
+  const allocations = await Allocation.find({ cacheProviderId, status: 'Active' });
+  const usedServerCount = allocations.length;
+  const usedCapacity = allocations.reduce((sum, a) => sum + a.capacityGB, 0);
+  await CacheProvider.findByIdAndUpdate(cacheProviderId, {
+    usedServerCount,
+    usedCapacity,
+  });
 }
 
 export async function GET() {
@@ -43,6 +57,18 @@ export async function POST(request: Request) {
   try {
     await dbConnect();
     const body = await request.json();
+
+    const [company, provider, server] = await Promise.all([
+      Company.findById(body.companyId),
+      CacheProvider.findById(body.cacheProviderId),
+      Server.findById(body.serverId),
+    ]);
+
+    const cpName = provider ? `${provider.shortCode} - ${provider.name}` : 'Unknown';
+    const compName = company ? company.name : 'Unknown';
+    const srvName = server ? server.name : 'Unknown';
+    const details = `Allocated ${body.capacityGB} GB from ${cpName} to ${compName} on server ${srvName}`;
+    const userEmail = await logActivity(request, 'CREATE', 'Allocation', details);
     
     const allocation = await Allocation.create({
       companyId: body.companyId,
@@ -52,9 +78,12 @@ export async function POST(request: Request) {
       goLiveDate: new Date(body.goLiveDate),
       status: body.status,
       notes: body.notes,
+      createdBy: userEmail,
+      updatedBy: userEmail,
     });
 
     await updateServerUsedCapacity(body.serverId);
+    await updateCacheProviderStats(body.cacheProviderId);
 
     return NextResponse.json({ success: true, data: allocation }, { status: 201 });
   } catch (error: any) {

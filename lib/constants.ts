@@ -9,6 +9,12 @@ export const NAVIGATION_ITEMS = [
     icon: 'LayoutGrid',
   },
   {
+    id: 'allocations',
+    name: 'Distribution',
+    href: '/dashboard/allocations',
+    icon: 'Network',
+  },
+  {
     id: 'companies',
     name: 'Companies',
     href: '/dashboard/companies',
@@ -27,16 +33,16 @@ export const NAVIGATION_ITEMS = [
     icon: 'Server',
   },
   {
-    id: 'allocations',
-    name: 'Distribution',
-    href: '/dashboard/allocations',
-    icon: 'Network',
-  },
-  {
     id: 'reports',
     name: 'Reports',
     href: '/dashboard/reports',
     icon: 'BarChart3',
+  },
+  {
+    id: 'logs',
+    name: 'Activity Logs',
+    href: '/dashboard/logs',
+    icon: 'History',
   },
 ];
 

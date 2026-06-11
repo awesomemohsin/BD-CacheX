@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
 import { CacheProvider } from '@/lib/models/CacheProvider';
 
+import { logActivity } from '@/lib/logging';
+
 export async function GET() {
   try {
     await dbConnect();
@@ -16,7 +18,12 @@ export async function POST(request: Request) {
   try {
     await dbConnect();
     const body = await request.json();
-    const provider = await CacheProvider.create(body);
+    const userEmail = await logActivity(request, 'CREATE', 'CacheProvider', `Created cache provider: ${body.shortCode} - ${body.name}`);
+    const provider = await CacheProvider.create({
+      ...body,
+      createdBy: userEmail,
+      updatedBy: userEmail,
+    });
     return NextResponse.json({ success: true, data: provider }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
