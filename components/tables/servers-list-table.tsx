@@ -13,22 +13,60 @@ import { Edit2, Trash2, Eye, Search } from 'lucide-react';
 import { Server } from '@/lib/types';
 import { toast } from 'sonner';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 interface ServersListTableProps {
   onEdit: (server: Server) => void;
 }
 
 export function ServersListTable({ onEdit }: ServersListTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [brandFilter, setBrandFilter] = useState('all');
+  const [modelFilter, setModelFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState<Server | null>(null);
   
   const { data: servers = [], error, isLoading, mutate } = useSWR<Server[]>('/api/servers', fetcher);
   
-  const filteredServers = servers.filter(
-    (server) =>
+  const uniqueBrands = Array.from(
+    new Set(servers.map((s) => s.brand).filter(Boolean))
+  );
+
+  const uniqueModels = Array.from(
+    new Set(
+      servers
+        .filter((s) => brandFilter === 'all' || s.brand === brandFilter)
+        .map((s) => s.model)
+        .filter(Boolean)
+    )
+  );
+
+  const handleBrandChange = (value: string) => {
+    setBrandFilter(value);
+    setModelFilter('all');
+  };
+
+  const filteredServers = servers.filter((server) => {
+    const matchesSearch =
       server.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       server.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      server.ipAddress.includes(searchQuery)
-  );
+      server.ipAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      server.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      server.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (server.rackNumber && server.rackNumber.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesBrand = brandFilter === 'all' || server.brand === brandFilter;
+    const matchesModel = modelFilter === 'all' || server.model === modelFilter;
+    const matchesStatus = statusFilter === 'all' || server.status === statusFilter;
+
+    return matchesSearch && matchesBrand && matchesModel && matchesStatus;
+  });
 
   const handleDelete = (server: Server) => {
     setDeleteTarget(server);
@@ -62,15 +100,56 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
     <div>
       {/* Search Bar */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
-              placeholder="Search by server name, location, or IP..."
+              placeholder="Search by name, location, brand, model, IP or rack..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-slate-50"
             />
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <div className="w-[140px]">
+              <Select value={brandFilter} onValueChange={handleBrandChange}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Brands" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Brands</SelectItem>
+                  {uniqueBrands.map((b) => (
+                    <SelectItem key={b} value={b}>{b}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-[140px]">
+              <Select value={modelFilter} onValueChange={setModelFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Models" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Models</SelectItem>
+                  {uniqueModels.map((m) => (
+                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-[140px]">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>

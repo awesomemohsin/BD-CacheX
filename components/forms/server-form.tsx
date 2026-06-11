@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/api-client';
 
 interface ServerFormProps {
   initialData?: Server;
@@ -38,6 +40,48 @@ export function ServerForm({
       status: StatusType.ACTIVE,
       notes: '',
     }
+  );
+
+  const { data: servers = [] } = useSWR<Server[]>('/api/servers', fetcher);
+
+  const defaultBrands = ['Dell', 'HP'];
+  const availableBrands = Array.from(
+    new Set([
+      ...defaultBrands,
+      ...servers.map((s) => s.brand),
+      ...(initialData?.brand ? [initialData.brand] : []),
+    ].filter(Boolean))
+  );
+
+  const [isCustomBrand, setIsCustomBrand] = useState(
+    initialData ? !defaultBrands.includes(initialData.brand) : false
+  );
+  
+  const getModelsForBrand = (brandName: string) => {
+    if (!brandName) return [];
+    const defaultModels: Record<string, string[]> = {
+      Dell: ['DELL 730', 'DELL 830'],
+      HP: ['HP ProLiant'],
+    };
+    const modelsFromServers = servers
+      .filter((s) => s.brand === brandName && s.model)
+      .map((s) => s.model);
+
+    return Array.from(
+      new Set([
+        ...(defaultModels[brandName] || []),
+        ...modelsFromServers,
+        ...(initialData?.brand === brandName && initialData?.model
+          ? [initialData.model]
+          : []),
+      ].filter(Boolean))
+    );
+  };
+
+  const availableModels = getModelsForBrand(formData.brand || '');
+
+  const [isCustomModel, setIsCustomModel] = useState(
+    initialData ? !availableModels.includes(initialData.model) : false
   );
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -96,56 +140,121 @@ export function ServerForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Brand *
-          </label>
-          <Select
-            value={formData.brand || ''}
-            onValueChange={(value) => {
-              setFormData((prev) => ({
-                ...prev,
-                brand: value,
-                model: '',
-              }));
-              if (errors.brand) {
-                setErrors((prev) => ({ ...prev, brand: '' }));
-              }
-            }}
-          >
-            <SelectTrigger className={errors.brand ? 'border-red-500' : ''}>
-              <SelectValue placeholder="Select Brand" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Dell">Dell</SelectItem>
-              <SelectItem value="HP">HP</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-medium text-slate-700">
+              Brand *
+            </label>
+            {isCustomBrand && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustomBrand(false);
+                  setFormData((prev) => ({ ...prev, brand: '', model: '' }));
+                }}
+                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium cursor-pointer"
+              >
+                Choose existing brand
+              </button>
+            )}
+          </div>
+          {isCustomBrand ? (
+            <Input
+              value={formData.brand || ''}
+              onChange={(e) => handleChange('brand', e.target.value)}
+              placeholder="e.g., Cisco, Supermicro"
+              className={errors.brand ? 'border-red-500' : ''}
+            />
+          ) : (
+            <Select
+              value={formData.brand || ''}
+              onValueChange={(value) => {
+                if (value === '__new_brand__') {
+                  setIsCustomBrand(true);
+                  setIsCustomModel(true);
+                  setFormData((prev) => ({ ...prev, brand: '', model: '' }));
+                } else {
+                  setFormData((prev) => ({
+                    ...prev,
+                    brand: value,
+                    model: '',
+                  }));
+                  if (errors.brand) {
+                    setErrors((prev) => ({ ...prev, brand: '' }));
+                  }
+                }
+              }}
+            >
+              <SelectTrigger className={errors.brand ? 'border-red-500' : ''}>
+                <SelectValue placeholder="Select Brand" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableBrands.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
+                ))}
+                <SelectItem value="__new_brand__" className="text-indigo-600 font-medium border-t border-slate-100">
+                  + Add New Brand...
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           {errors.brand && <p className="text-xs text-red-650">{errors.brand}</p>}
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Model *
-          </label>
-          <Select
-            value={formData.model || ''}
-            onValueChange={(value) => handleChange('model', value)}
-            disabled={!formData.brand}
-          >
-            <SelectTrigger className={errors.model ? 'border-red-500' : ''}>
-              <SelectValue placeholder="Select Model" />
-            </SelectTrigger>
-            <SelectContent>
-              {formData.brand === 'Dell' ? (
-                <>
-                  <SelectItem value="DELL 730">DELL 730</SelectItem>
-                  <SelectItem value="DELL 830">DELL 830</SelectItem>
-                </>
-              ) : formData.brand === 'HP' ? (
-                <SelectItem value="HP">HP</SelectItem>
-              ) : null}
-            </SelectContent>
-          </Select>
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-medium text-slate-700">
+              Model *
+            </label>
+            {isCustomModel && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustomModel(false);
+                  setFormData((prev) => ({ ...prev, model: '' }));
+                }}
+                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium cursor-pointer"
+              >
+                Choose existing model
+              </button>
+            )}
+          </div>
+          {isCustomModel ? (
+            <Input
+              value={formData.model || ''}
+              onChange={(e) => handleChange('model', e.target.value)}
+              placeholder="e.g., DELL 730, HP ProLiant"
+              className={errors.model ? 'border-red-500' : ''}
+            />
+          ) : (
+            <Select
+              value={formData.model || ''}
+              onValueChange={(value) => {
+                if (value === '__new_model__') {
+                  setIsCustomModel(true);
+                  setFormData((prev) => ({ ...prev, model: '' }));
+                } else {
+                  handleChange('model', value);
+                }
+              }}
+              disabled={!formData.brand}
+            >
+              <SelectTrigger className={errors.model ? 'border-red-500' : ''}>
+                <SelectValue placeholder="Select Model" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableModels.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+                <SelectItem value="__new_model__" className="text-indigo-600 font-medium border-t border-slate-100">
+                  + Add New Model...
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           {errors.model && <p className="text-xs text-red-650">{errors.model}</p>}
         </div>
       </div>

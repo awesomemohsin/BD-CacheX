@@ -12,19 +12,67 @@ import { Edit2, Trash2, Eye, Search } from 'lucide-react';
 import { Allocation } from '@/lib/types';
 import { toast } from 'sonner';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 export function AllocationsTable() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [companyTypeFilter, setCompanyTypeFilter] = useState('all');
+  const [providerFilter, setProviderFilter] = useState('all');
+  const [serverFilter, setServerFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState<Allocation | null>(null);
   
   const { data: allocations = [], error, isLoading, mutate } = useSWR<Allocation[]>('/api/allocations', fetcher);
   
-  const filteredAllocations = allocations.filter(
-    (allocation) =>
+  const uniqueProviders = Array.from(
+    new Set(
+      allocations.map((a) =>
+        JSON.stringify({ id: a.cacheProviderId, name: a.cacheProviderName })
+      )
+    )
+  ).map((p) => JSON.parse(p)) as { id: string; name: string }[];
+
+  const uniqueServers = Array.from(
+    new Set(
+      allocations.map((a) =>
+        JSON.stringify({ id: a.serverId, name: a.serverName })
+      )
+    )
+  ).map((s) => JSON.parse(s)) as { id: string; name: string }[];
+
+  const filteredAllocations = allocations.filter((allocation) => {
+    const matchesSearch =
       allocation.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       allocation.cacheProviderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       allocation.serverName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      allocation.id.includes(searchQuery)
-  );
+      allocation.id.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCompanyType =
+      companyTypeFilter === 'all' || allocation.companyType === companyTypeFilter;
+
+    const matchesProvider =
+      providerFilter === 'all' || allocation.cacheProviderId === providerFilter;
+
+    const matchesServer =
+      serverFilter === 'all' || allocation.serverId === serverFilter;
+
+    const matchesStatus =
+      statusFilter === 'all' || allocation.status === statusFilter;
+
+    return (
+      matchesSearch &&
+      matchesCompanyType &&
+      matchesProvider &&
+      matchesServer &&
+      matchesStatus
+    );
+  });
 
   const handleDelete = (allocation: Allocation) => {
     setDeleteTarget(allocation);
@@ -58,15 +106,68 @@ export function AllocationsTable() {
     <div>
       {/* Search Bar */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
-              placeholder="Search by company, cache provider, or server..."
+              placeholder="Search by company, provider, server, or ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-slate-50"
             />
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <div className="w-[130px]">
+              <Select value={companyTypeFilter} onValueChange={setCompanyTypeFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="ISP">ISP</SelectItem>
+                  <SelectItem value="IIG">IIG</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-[150px]">
+              <Select value={providerFilter} onValueChange={setProviderFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Providers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Providers</SelectItem>
+                  {uniqueProviders.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-[150px]">
+              <Select value={serverFilter} onValueChange={setServerFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Servers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Servers</SelectItem>
+                  {uniqueServers.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-[130px]">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>

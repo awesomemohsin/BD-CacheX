@@ -12,21 +12,40 @@ import { Edit2, Trash2, Eye, Search } from 'lucide-react';
 import { Company } from '@/lib/types';
 import { toast } from 'sonner';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 interface CompaniesListTableProps {
   onEdit: (company: Company) => void;
 }
 
 export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState<Company | null>(null);
   
   const { data: companies = [], error, isLoading, mutate } = useSWR<Company[]>('/api/companies', fetcher);
   
-  const filteredCompanies = companies.filter(
-    (company) =>
+  const filteredCompanies = companies.filter((company) => {
+    const matchesSearch =
       company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      company.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      company.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (company.address && company.address.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesStatus =
+      statusFilter === 'all' || company.status === statusFilter;
+
+    const matchesType =
+      typeFilter === 'all' || company.type === typeFilter;
+
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
   const handleDelete = (company: Company) => {
     setDeleteTarget(company);
@@ -61,15 +80,42 @@ export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
     <div>
       {/* Search Bar */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
-              placeholder="Search by name, email, or contact..."
+              placeholder="Search by name, email, or address..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-slate-50"
             />
+          </div>
+          <div className="flex gap-3">
+            <div className="w-[140px]">
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="ISP">ISP</SelectItem>
+                  <SelectItem value="IIG">IIG</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-[140px]">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="bg-slate-50">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
