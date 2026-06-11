@@ -70,7 +70,7 @@ export default function DashboardPage() {
         />
         <StatCard
           icon={Network}
-          label="Active Allocations"
+          label="Active Distributions"
           value={activeAllocations}
           subtext={`of ${allocations.length} total`}
         />
@@ -88,14 +88,14 @@ export default function DashboardPage() {
           <ServersTable />
         </div>
 
-        {/* Allocations Table */}
+        {/* Distribution Table */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-100/30 overflow-hidden hover:shadow-md transition-shadow duration-300">
           <div className="p-6 border-b border-slate-100 bg-slate-50/50">
             <h3 className="text-lg font-bold text-slate-800">
-              Allocations Overview
+              Distribution Overview
             </h3>
             <p className="text-sm text-slate-500">
-              Live monitoring of cache capacity allocations across CDN edge servers
+              Live monitoring of cache capacity distributions across CDN edge servers
             </p>
           </div>
           <AllocationsTable />

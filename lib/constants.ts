@@ -28,7 +28,7 @@ export const NAVIGATION_ITEMS = [
   },
   {
     id: 'allocations',
-    name: 'Allocations',
+    name: 'Distribution',
     href: '/dashboard/allocations',
     icon: 'Network',
   },

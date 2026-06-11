@@ -104,7 +104,7 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Allocations</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Distributions</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{allocations.length}</div>
@@ -175,7 +175,7 @@ export default function ReportsPage() {
                 <TableHead>Company</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead className="text-right">Capacity</TableHead>
-                <TableHead className="text-right">Allocations</TableHead>
+                <TableHead className="text-right">Distributions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -213,7 +213,7 @@ export default function ReportsPage() {
                 <TableHead>Provider</TableHead>
                 <TableHead>Code</TableHead>
                 <TableHead className="text-right">Capacity</TableHead>
-                <TableHead className="text-right">Allocations</TableHead>
+                <TableHead className="text-right">Distributions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

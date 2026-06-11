@@ -22,17 +22,17 @@ export default function NewAllocationPage() {
       });
       const result = await res.json();
       if (result.success) {
-        toast.success('Allocation created successfully');
+        toast.success('Distribution created successfully');
         import('swr').then(({ mutate }) => {
           mutate('/api/allocations');
           mutate('/api/servers');
         });
         router.push('/dashboard/allocations');
       } else {
-        toast.error(result.error || 'Failed to create allocation');
+        toast.error(result.error || 'Failed to create distribution');
       }
     } catch (error) {
-      toast.error('Failed to create allocation');
+      toast.error('Failed to create distribution');
     } finally {
       setIsLoading(false);
     }
@@ -41,8 +41,8 @@ export default function NewAllocationPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Create New Allocation"
-        description="Allocate cache capacity to a company"
+        title="Create New Distribution"
+        description="Distribute cache capacity to a company"
       />
 
       <Card>

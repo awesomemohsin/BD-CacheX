@@ -259,7 +259,7 @@ export function AllocationForm({
         <Textarea
           value={formData.notes || ''}
           onChange={(e) => handleChange('notes', e.target.value)}
-          placeholder="Additional notes about this allocation"
+          placeholder="Additional notes about this distribution"
           rows={3}
         />
       </div>
@@ -268,7 +268,7 @@ export function AllocationForm({
       <div className="flex gap-3 pt-4">
         <Button type="submit" disabled={isLoading} className="flex-1 gap-2">
           {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-          {initialData ? 'Update Allocation' : 'Create Allocation'}
+          {initialData ? 'Update Distribution' : 'Create Distribution'}
         </Button>
       </div>
     </form>

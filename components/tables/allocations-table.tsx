@@ -38,17 +38,17 @@ export function AllocationsTable() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success('Allocation deleted successfully');
+        toast.success('Distribution deleted successfully');
         mutate();
         // Recalculate server capacities by reloading servers cache
         import('swr').then(({ mutate: globalMutate }) => {
           globalMutate('/api/servers');
         });
       } else {
-        toast.error(data.error || 'Failed to delete allocation');
+        toast.error(data.error || 'Failed to delete distribution');
       }
     } catch (err) {
-      toast.error('Failed to delete allocation');
+      toast.error('Failed to delete distribution');
     } finally {
       setDeleteTarget(null);
     }
@@ -73,16 +73,16 @@ export function AllocationsTable() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="p-8 text-center text-slate-500">Loading allocations...</div>
+        <div className="p-8 text-center text-slate-500">Loading distributions...</div>
       ) : filteredAllocations.length === 0 ? (
         <div className="p-6">
           <EmptyState
             icon={Eye}
-            title={searchQuery ? 'No allocations found' : 'No allocations yet'}
+            title={searchQuery ? 'No distributions found' : 'No distributions yet'}
             description={
               searchQuery
                 ? 'Try adjusting your search criteria'
-                : 'Start by creating a new allocation'
+                : 'Start by creating a new distribution'
             }
           />
         </div>
@@ -91,7 +91,7 @@ export function AllocationsTable() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/75 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                <th className="px-6 py-4">Allocation ID</th>
+                <th className="px-6 py-4">Distribution ID</th>
                 <th className="px-6 py-4">Company</th>
                 <th className="px-6 py-4">Type</th>
                 <th className="px-6 py-4">Cache Provider</th>
@@ -153,8 +153,8 @@ export function AllocationsTable() {
       {/* Delete Confirmation Dialog */}
       <ConfirmDeleteDialog
         open={!!deleteTarget}
-        title="Delete Allocation"
-        description="Are you sure you want to delete this allocation? This action cannot be undone."
+        title="Delete Distribution"
+        description="Are you sure you want to delete this distribution? This action cannot be undone."
         itemName={deleteTarget?.id}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

@@ -11,13 +11,13 @@ export default function AllocationsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Allocations"
-        description="View and manage cache allocations across servers"
+        title="Distribution"
+        description="View and manage cache distributions across servers"
         action={
           <Link href="/dashboard/allocations/new">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
-              New Allocation
+              New Distribution
             </Button>
           </Link>
         }
