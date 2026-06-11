@@ -37,7 +37,7 @@ export function CompanyModal({ open, company, onClose }: CompanyModalProps) {
         // Trigger global SWR mutation to reload tables
         import('swr').then(({ mutate }) => {
           mutate('/api/companies');
-          mutate('/api/allocations');
+          mutate('/api/distributions');
         });
         onClose();
       } else {

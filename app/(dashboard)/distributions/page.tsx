@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
-import { AllocationsTable } from '@/components/tables/allocations-table';
+import { DistributionsTable } from '@/components/tables/distributions-table';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 
-export default function AllocationsPage() {
+export default function DistributionsPage() {
   useEffect(() => {
     document.title = 'Distributions | BD CacheX';
   }, []);
@@ -18,7 +18,7 @@ export default function AllocationsPage() {
         title="Distribution"
         description="View and manage cache distributions across servers"
         action={
-          <Link href="/dashboard/allocations/new">
+          <Link href="/dashboard/distributions/new">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               New Distribution
@@ -28,7 +28,9 @@ export default function AllocationsPage() {
       />
 
       <div className="bg-white rounded-lg border border-slate-200">
-        <AllocationsTable />
+        <Suspense fallback={<div className="p-8 text-center text-slate-500">Loading distributions...</div>}>
+          <DistributionsTable />
+        </Suspense>
       </div>
     </div>
   );

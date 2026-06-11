@@ -1,12 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { StatusBadge } from '@/components/shared/status-badge';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
 import { formatDateString } from '@/lib/utils';
 import { Edit2, Trash2, Eye } from 'lucide-react';
+import { CompanyDetailsModal } from '@/components/shared/company-details-modal';
+import { Company } from '@/lib/types';
 
 export function CompaniesTable() {
+  const [viewTarget, setViewTarget] = useState<Company | null>(null);
   const { data: companies = [], isLoading } = useSWR<any[]>('/api/companies', fetcher);
 
   return (
@@ -51,7 +55,14 @@ export function CompaniesTable() {
             ) : (
               companies.map((company) => (
                 <tr key={company.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-slate-800">{company.name}</td>
+                  <td className="px-6 py-4 font-semibold text-slate-800">
+                    <span
+                      onClick={() => setViewTarget(company)}
+                      className="hover:underline cursor-pointer text-blue-600 hover:text-blue-800"
+                    >
+                      {company.name}
+                    </span>
+                  </td>
                   <td className="px-6 py-4">
                     <span className="text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
                       {company.type}
@@ -73,7 +84,10 @@ export function CompaniesTable() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all">
+                      <button 
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all"
+                        onClick={() => setViewTarget(company)}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all">
@@ -90,6 +104,11 @@ export function CompaniesTable() {
           </tbody>
         </table>
       </div>
+      <CompanyDetailsModal
+        open={!!viewTarget}
+        company={viewTarget}
+        onClose={() => setViewTarget(null)}
+      />
     </div>
   );
 }

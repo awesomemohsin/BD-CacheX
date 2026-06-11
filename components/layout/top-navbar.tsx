@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Settings } from 'lucide-react';
+import { Bell, Settings, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ProfileModal } from '@/components/shared/profile-modal';
@@ -24,7 +24,11 @@ import { toast } from 'sonner';
 
 import { useState, useEffect } from 'react';
 
-export function TopNavbar() {
+interface TopNavbarProps {
+  onMenuClick?: () => void;
+}
+
+export function TopNavbar({ onMenuClick }: TopNavbarProps) {
   const [email, setEmail] = useState('admin@bdcache.com');
   const [name, setName] = useState('Admin User');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -84,7 +88,18 @@ export function TopNavbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-64 right-0 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-40">
+      <header className="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-40">
+        {/* Mobile menu toggle */}
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="p-2 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors mr-4 lg:hidden"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+        
         {/* Left spacer - Search option removed */}
         <div className="flex-1"></div>
 

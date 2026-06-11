@@ -11,7 +11,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'BD CacheX',
-  description: 'Overview of your CDN cache allocation system',
+  description: 'Overview of your CDN cache distribution system',
   icons: {
     icon: '/favicon.png',
   },

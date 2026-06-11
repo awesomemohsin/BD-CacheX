@@ -1,14 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { CapacityProgress } from '@/components/shared/capacity-progress';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
 import { calculateCapacityPercentage, formatCapacity } from '@/lib/utils';
 import { Edit2, Trash2, Eye } from 'lucide-react';
+import { ServerDetailsModal } from '@/components/shared/server-details-modal';
+import { Server } from '@/lib/types';
 
 export function ServersTable() {
-  const { data: servers = [], isLoading } = useSWR<any[]>('/api/servers', fetcher);
+  const [viewTarget, setViewTarget] = useState<Server | null>(null);
+  const { data: servers = [], isLoading } = useSWR<Server[]>('/api/servers', fetcher);
 
   return (
     <div>
@@ -17,7 +21,7 @@ export function ServersTable() {
           Server Utilization
         </h3>
         <p className="text-sm text-slate-500">
-          Monitor server capacity and allocation status
+          Monitor server capacity and distribution status
         </p>
       </div>
 
@@ -54,7 +58,14 @@ export function ServersTable() {
             ) : (
               servers.map((server) => (
                 <tr key={server.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-slate-800">{server.name}</td>
+                  <td className="px-6 py-4 font-semibold text-slate-800">
+                    <span
+                      onClick={() => setViewTarget(server)}
+                      className="hover:underline cursor-pointer text-blue-600 hover:text-blue-800"
+                    >
+                      {server.name}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 text-slate-600 text-sm">{server.model}</td>
                   <td className="px-6 py-4 text-slate-600 text-sm">{server.brand}</td>
                   <td className="px-6 py-4 text-slate-600 text-sm">{server.location}</td>
@@ -82,7 +93,10 @@ export function ServersTable() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all">
+                      <button 
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all"
+                        onClick={() => setViewTarget(server)}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all">
@@ -99,6 +113,11 @@ export function ServersTable() {
           </tbody>
         </table>
       </div>
+      <ServerDetailsModal
+        open={!!viewTarget}
+        server={viewTarget}
+        onClose={() => setViewTarget(null)}
+      />
     </div>
   );
 }

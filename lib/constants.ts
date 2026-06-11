@@ -9,9 +9,9 @@ export const NAVIGATION_ITEMS = [
     icon: 'LayoutGrid',
   },
   {
-    id: 'allocations',
+    id: 'distributions',
     name: 'Distribution',
-    href: '/dashboard/allocations',
+    href: '/dashboard/distributions',
     icon: 'Network',
   },
   {

@@ -73,7 +73,7 @@ export default function LoginPage() {
           Welcome to BD CacheX
         </h2>
         <p className="mt-2 text-center text-sm text-slate-500">
-          Capacity allocation & audit trace management
+          Capacity distribution & audit trace management
         </p>
       </div>
 

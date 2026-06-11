@@ -4,7 +4,7 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { PageHeader } from '@/components/shared/page-header';
 import { CompaniesTable } from '@/components/tables/companies-table';
 import { ServersTable } from '@/components/tables/servers-table';
-import { AllocationsTable } from '@/components/tables/allocations-table';
+import { DistributionsTable } from '@/components/tables/distributions-table';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
@@ -19,16 +19,16 @@ export default function DashboardPage() {
   const { data: companies = [], isLoading: loadingComp } = useSWR<any[]>('/api/companies', fetcher);
   const { data: cacheProviders = [], isLoading: loadingCp } = useSWR<any[]>('/api/cache-providers', fetcher);
   const { data: servers = [], isLoading: loadingSrv } = useSWR<any[]>('/api/servers', fetcher);
-  const { data: allocations = [], isLoading: loadingAlloc } = useSWR<any[]>('/api/allocations', fetcher);
+  const { data: distributions = [], isLoading: loadingDist } = useSWR<any[]>('/api/distributions', fetcher);
 
-  const isLoading = loadingComp || loadingCp || loadingSrv || loadingAlloc;
+  const isLoading = loadingComp || loadingCp || loadingSrv || loadingDist;
 
   // Calculate metrics
   const totalCapacity = servers.reduce((sum, server) => sum + server.totalCapacityGB, 0);
   const usedCapacity = servers.reduce((sum, server) => sum + server.usedCapacityGB, 0);
   const activeServers = servers.filter((s) => s.status === 'Active').length;
   const activeCompanies = companies.filter((c) => c.status === 'Active').length;
-  const activeAllocations = allocations.filter((a) => a.status === 'Active').length;
+  const activeDistributions = distributions.filter((d) => d.status === 'Active').length;
 
   if (isLoading) {
     return (
@@ -54,30 +54,35 @@ export default function DashboardPage() {
           label="Total Capacity"
           value={`${totalCapacity} GB`}
           subtext={`${usedCapacity} GB used`}
+          href="/dashboard/servers"
         />
         <StatCard
           icon={Server}
           label="Active Servers"
           value={activeServers}
           subtext={`of ${servers.length} total`}
+          href="/dashboard/servers"
         />
         <StatCard
           icon={Building2}
           label="Connected Companies"
           value={activeCompanies}
           subtext={`of ${companies.length} total`}
+          href="/dashboard/companies"
         />
         <StatCard
           icon={Zap}
           label="Cache Providers"
           value={cacheProviders.length}
           subtext="Active partners"
+          href="/dashboard/cache-providers"
         />
         <StatCard
           icon={Network}
           label="Active Distributions"
-          value={activeAllocations}
-          subtext={`of ${allocations.length} total`}
+          value={activeDistributions}
+          subtext={`of ${distributions.length} total`}
+          href="/dashboard/distributions"
         />
       </div>
 
@@ -105,7 +110,7 @@ export default function DashboardPage() {
               Live monitoring of cache capacity distributions across CDN edge servers
             </p>
           </div>
-          <AllocationsTable isDashboard={true} />
+          <DistributionsTable isDashboard={true} />
         </div>
       </div>
     </div>

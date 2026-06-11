@@ -37,7 +37,7 @@ export function CacheProviderModal({ open, provider, onClose }: CacheProviderMod
         // Trigger global SWR mutation to reload tables
         import('swr').then(({ mutate }) => {
           mutate('/api/cache-providers');
-          mutate('/api/allocations');
+          mutate('/api/distributions');
         });
         onClose();
       } else {

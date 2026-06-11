@@ -73,7 +73,7 @@ export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
         mutate();
         // Also refresh other endpoints if needed (global mutate)
         import('swr').then(({ mutate: globalMutate }) => {
-          globalMutate('/api/allocations');
+          globalMutate('/api/distributions');
           globalMutate('/api/servers');
         });
       } else {
@@ -163,7 +163,14 @@ export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
             <tbody className="divide-y divide-slate-100 bg-white">
               {filteredCompanies.map((company) => (
                 <tr key={company.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-slate-800">{company.name}</td>
+                  <td className="px-6 py-4 font-semibold text-slate-800">
+                    <span
+                      onClick={() => setViewTarget(company)}
+                      className="hover:underline cursor-pointer text-blue-600 hover:text-blue-800"
+                    >
+                      {company.name}
+                    </span>
+                  </td>
                   <td className="px-6 py-4">
                     <span className="text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
                       {company.type}

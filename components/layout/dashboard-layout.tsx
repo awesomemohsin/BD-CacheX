@@ -8,6 +8,7 @@ import { TopNavbar } from './top-navbar';
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     // 1. Guard route by verifying localStorage credentials
@@ -63,11 +64,29 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      <AppSidebar />
-      <div className="flex-1 flex flex-col ml-64">
-        <TopNavbar />
-        <main className="flex-1 overflow-auto pt-16 pb-6 px-6">
+    <div className="flex h-screen bg-slate-50 overflow-hidden relative">
+      {/* Desktop Sidebar */}
+      <AppSidebar className="hidden lg:flex" />
+
+      {/* Mobile Sidebar Overlay Drawer */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity duration-200"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          {/* Drawer panel */}
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl animate-in slide-in-from-left duration-200">
+            <AppSidebar className="flex w-full" onClose={() => setIsMobileSidebarOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Workspace */}
+      <div className="flex-1 flex flex-col ml-0 lg:ml-64 min-w-0 overflow-hidden">
+        <TopNavbar onMenuClick={() => setIsMobileSidebarOpen(true)} />
+        <main className="flex-1 overflow-auto pt-20 pb-6 px-4 md:px-6">
           {children}
         </main>
       </div>

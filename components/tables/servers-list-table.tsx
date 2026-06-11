@@ -84,9 +84,9 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
       if (data.success) {
         toast.success('Server deleted successfully');
         mutate();
-        // Trigger reload on allocations since deleting server can affect allocation lookup
+        // Trigger reload on distributions since deleting server can affect distribution lookup
         import('swr').then(({ mutate: globalMutate }) => {
-          globalMutate('/api/allocations');
+          globalMutate('/api/distributions');
         });
       } else {
         toast.error(data.error || 'Failed to delete server');
@@ -193,7 +193,14 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
             <tbody className="divide-y divide-slate-100 bg-white">
               {filteredServers.map((server) => (
                 <tr key={server.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-slate-800">{server.name}</td>
+                  <td className="px-6 py-4 font-semibold text-slate-800">
+                    <span
+                      onClick={() => setViewTarget(server)}
+                      className="hover:underline cursor-pointer text-blue-600 hover:text-blue-800"
+                    >
+                      {server.name}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 text-sm text-slate-600">{server.model}</td>
                   <td className="px-6 py-4 text-sm text-slate-600">{server.brand}</td>
                   <td className="px-6 py-4 text-sm text-slate-600">{server.location}</td>

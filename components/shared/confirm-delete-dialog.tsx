@@ -43,14 +43,14 @@ export function ConfirmDeleteDialog({
           </div>
           <DialogDescription className="text-left">
             {description}
-            {itemName && (
-              <div className="mt-3 p-3 bg-slate-50 rounded border border-slate-200">
-                <p className="text-sm font-medium text-slate-900 break-words">
-                  {itemName}
-                </p>
-              </div>
-            )}
           </DialogDescription>
+          {itemName && (
+            <div className="mt-3 p-3 bg-slate-50 rounded border border-slate-200">
+              <p className="text-sm font-medium text-slate-900 break-words">
+                {itemName}
+              </p>
+            </div>
+          )}
         </DialogHeader>
         <DialogFooter className="flex gap-3 justify-end">
           <Button

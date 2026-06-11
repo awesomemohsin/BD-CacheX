@@ -12,6 +12,7 @@ import {
   Network,
   BarChart3,
   History,
+  X,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -24,14 +25,36 @@ const iconMap: Record<string, React.ReactNode> = {
   History: <History className="w-5 h-5" />,
 };
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  className?: string;
+  onClose?: () => void;
+}
+
+export function AppSidebar({ className, onClose }: AppSidebarProps) {
   const pathname = usePathname();
 
+  const handleLinkClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div className={cn("fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 flex flex-col z-50", className)}>
       {/* Logo/Brand */}
-      <div className="p-4 border-b border-slate-200 flex justify-center items-center">
-        <img src="/logo.png" alt="BD CacheX Logo" className="h-28 w-full object-contain" />
+      <div className="p-4 border-b border-slate-200 flex justify-between items-center relative shrink-0">
+        <div className="flex-1 flex justify-center items-center">
+          <img src="/logo.png" alt="BD CacheX Logo" className="h-28 w-full object-contain" />
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors lg:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -43,6 +66,7 @@ export function AppSidebar() {
               <Link
                 key={item.id}
                 href={item.href}
+                onClick={handleLinkClick}
                 className={cn(
                   'flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ease-out transform',
                   isActive

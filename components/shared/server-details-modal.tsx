@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,12 +8,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Server, Allocation } from '@/lib/types';
+import { Server, Distribution, Company, CacheProvider } from '@/lib/types';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
 import { formatDateString, formatCapacity } from '@/lib/utils';
 import { StatusBadge } from './status-badge';
-import { Database, Calendar, User, Info, Building2, HardDrive, MapPin, Hash } from 'lucide-react';
+import { Database, Calendar, User, Info, Building2, MapPin, Hash } from 'lucide-react';
+import { CompanyDetailsModal } from './company-details-modal';
+import { CacheProviderDetailsModal } from './cache-provider-details-modal';
 
 interface ServerDetailsModalProps {
   open: boolean;
@@ -25,11 +28,13 @@ export function ServerDetailsModal({
   server,
   onClose,
 }: ServerDetailsModalProps) {
-  const { data: allocations = [] } = useSWR<Allocation[]>('/api/allocations', fetcher);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<CacheProvider | null>(null);
+  const { data: distributions = [] } = useSWR<Distribution[]>('/api/distributions', fetcher);
 
   if (!server) return null;
 
-  const serverAllocations = allocations.filter((a) => a.serverId === server.id);
+  const serverDistributions = distributions.filter((d) => d.serverId === server.id);
 
   const totalCap = server.totalCapacityGB ?? 0;
   const usedCap = server.usedCapacityGB ?? 0;
@@ -130,19 +135,19 @@ export function ServerDetailsModal({
           )}
         </div>
 
-        {/* Allocations Table */}
+        {/* Distributions Table */}
         <div className="mt-6">
           <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
             <Building2 className="w-4 h-4 text-slate-500" />
-            <span>Active Distributions Hosted ({serverAllocations.length})</span>
+            <span>Active Distributions Hosted ({serverDistributions.length})</span>
           </h4>
-          {serverAllocations.length === 0 ? (
+          {serverDistributions.length === 0 ? (
             <div className="text-center py-8 text-xs text-slate-500 bg-slate-50/50 border border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center gap-1">
               <Info className="w-4 h-4 text-slate-400" />
               <span>No distributions currently mapped to this server.</span>
             </div>
           ) : (
-            <div className="border border-slate-200 rounded-lg overflow-hidden text-xs">
+            <div className="border border-slate-200 rounded-lg overflow-x-auto text-xs">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold text-[10px]">
@@ -156,11 +161,11 @@ export function ServerDetailsModal({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
-                  {serverAllocations.map((alloc) => (
+                  {serverDistributions.map((alloc) => (
                     <tr key={alloc.id} className="hover:bg-slate-50/50">
                       <td className="px-4 py-2.5">
                         <a
-                          href={`/dashboard/allocations?id=${alloc.id.substring(0, 6)}`}
+                          href={`/dashboard/distributions?id=${alloc.id.substring(0, 6)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline hover:text-blue-700 font-mono font-medium"
@@ -168,10 +173,32 @@ export function ServerDetailsModal({
                           {alloc.id.substring(0, 6)}
                         </a>
                       </td>
-                      <td className="px-4 py-2.5 font-medium text-slate-800">{alloc.companyName}</td>
+                      <td className="px-4 py-2.5 font-medium text-slate-800">
+                        {alloc.company ? (
+                          <span
+                            onClick={() => setSelectedCompany(alloc.company!)}
+                            className="hover:underline cursor-pointer text-blue-600 hover:text-blue-800"
+                          >
+                            {alloc.companyName}
+                          </span>
+                        ) : (
+                          alloc.companyName
+                        )}
+                      </td>
                       <td className="px-4 py-2.5 uppercase text-slate-500 text-[10px] font-bold">{alloc.companyType}</td>
                       <td className="px-4 py-2.5 font-semibold text-slate-700">{formatCapacity(alloc.capacityGB)}</td>
-                      <td className="px-4 py-2.5 text-slate-655 font-medium truncate max-w-[120px]">{alloc.cacheProviderName}</td>
+                      <td className="px-4 py-2.5 text-slate-655 font-medium truncate max-w-[120px]">
+                        {alloc.cacheProvider ? (
+                          <span
+                            onClick={() => setSelectedProvider(alloc.cacheProvider!)}
+                            className="hover:underline cursor-pointer text-blue-600 hover:text-blue-800"
+                          >
+                            {alloc.cacheProviderName}
+                          </span>
+                        ) : (
+                          alloc.cacheProviderName
+                        )}
+                      </td>
                       <td className="px-4 py-2.5 text-slate-500">{formatDateString(alloc.goLiveDate)}</td>
                       <td className="px-4 py-2.5 text-slate-500">{alloc.createdBy || 'system@bdcache.com'}</td>
                     </tr>
@@ -182,6 +209,17 @@ export function ServerDetailsModal({
           )}
         </div>
       </DialogContent>
+      {/* Sub Modals */}
+      <CompanyDetailsModal
+        open={!!selectedCompany}
+        company={selectedCompany}
+        onClose={() => setSelectedCompany(null)}
+      />
+      <CacheProviderDetailsModal
+        open={!!selectedProvider}
+        provider={selectedProvider}
+        onClose={() => setSelectedProvider(null)}
+      />
     </Dialog>
   );
 }

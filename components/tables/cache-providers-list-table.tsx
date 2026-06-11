@@ -59,9 +59,9 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
       if (data.success) {
         toast.success('Cache provider deleted successfully');
         mutate();
-        // Trigger reload on allocations since deleting CP can affect allocation lookup
+        // Trigger reload on distributions since deleting CP can affect distribution lookup
         import('swr').then(({ mutate: globalMutate }) => {
-          globalMutate('/api/allocations');
+          globalMutate('/api/distributions');
         });
       } else {
         toast.error(data.error || 'Failed to delete provider');
@@ -140,7 +140,12 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
               {filteredProviders.map((provider) => (
                 <tr key={provider.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-4 font-semibold text-slate-800">
-                    {provider.shortCode} - {provider.name}
+                    <span
+                      onClick={() => setViewTarget(provider)}
+                      className="hover:underline cursor-pointer text-blue-600 hover:text-blue-800"
+                    >
+                      {provider.shortCode} - {provider.name}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className="font-mono text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">

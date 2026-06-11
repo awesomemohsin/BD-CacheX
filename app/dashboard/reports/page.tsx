@@ -25,9 +25,9 @@ export default function ReportsPage() {
   const { data: companies = [], isLoading: loadingComp } = useSWR<any[]>('/api/companies', fetcher);
   const { data: cacheProviders = [], isLoading: loadingCp } = useSWR<any[]>('/api/cache-providers', fetcher);
   const { data: servers = [], isLoading: loadingSrv } = useSWR<any[]>('/api/servers', fetcher);
-  const { data: allocations = [], isLoading: loadingAlloc } = useSWR<any[]>('/api/allocations', fetcher);
+  const { data: distributions = [], isLoading: loadingDist } = useSWR<any[]>('/api/distributions', fetcher);
 
-  const isLoading = loadingComp || loadingCp || loadingSrv || loadingAlloc;
+  const isLoading = loadingComp || loadingCp || loadingSrv || loadingDist;
 
   if (isLoading) {
     return (
@@ -40,27 +40,27 @@ export default function ReportsPage() {
 
   // Calculate company-wise capacity
   const companyCapacity = companies.map((company) => {
-    const companyAllocations = allocations.filter((a) => a.companyId === company.id);
-    const totalCapacity = companyAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+    const companyDistributions = distributions.filter((d) => d.companyId === company.id);
+    const totalCapacity = companyDistributions.reduce((sum, d) => sum + d.capacityGB, 0);
     return {
       name: company.name,
       type: company.type,
       capacity: totalCapacity,
-      allocationCount: companyAllocations.length,
+      distributionCount: companyDistributions.length,
     };
   });
 
   // Calculate cache provider-wise capacity
   const providerCapacity = cacheProviders.map((provider) => {
-    const providerAllocations = allocations.filter(
-      (a) => a.cacheProviderId === provider.id
+    const providerDistributions = distributions.filter(
+      (d) => d.cacheProviderId === provider.id
     );
-    const totalCapacity = providerAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+    const totalCapacity = providerDistributions.reduce((sum, d) => sum + d.capacityGB, 0);
     return {
       name: provider.name,
       shortCode: provider.shortCode,
       capacity: totalCapacity,
-      allocationCount: providerAllocations.length,
+      distributionCount: providerDistributions.length,
     };
   });
 
@@ -111,7 +111,7 @@ export default function ReportsPage() {
             <CardTitle className="text-sm font-medium">Total Distributions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{allocations.length}</div>
+            <div className="text-3xl font-bold">{distributions.length}</div>
             <p className="text-xs text-slate-600 mt-2">
               Across {companies.length} companies
             </p>
@@ -193,7 +193,7 @@ export default function ReportsPage() {
                     {formatCapacity(company.capacity)}
                   </TableCell>
                   <TableCell className="text-right">
-                    {company.allocationCount}
+                    {company.distributionCount}
                   </TableCell>
                 </TableRow>
               ))}
@@ -233,7 +233,7 @@ export default function ReportsPage() {
                     {formatCapacity(provider.capacity)}
                   </TableCell>
                   <TableCell className="text-right">
-                    {provider.allocationCount}
+                    {provider.distributionCount}
                   </TableCell>
                 </TableRow>
               ))}
