@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'Login | BD CacheX';
@@ -23,11 +24,13 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
+      setErrorMsg('Please enter both email and password');
       toast.error('Please enter both email and password');
       return;
     }
 
     setIsLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -45,9 +48,11 @@ export default function LoginPage() {
           router.push('/dashboard');
         }, 800);
       } else {
+        setErrorMsg(result.error || 'Invalid email or password');
         toast.error(result.error || 'Invalid credentials');
       }
     } catch (err) {
+      setErrorMsg('Network error. Failed to log in.');
       toast.error('Network error. Failed to log in.');
     } finally {
       setIsLoading(false);
@@ -75,6 +80,12 @@ export default function LoginPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 px-4 sm:px-0">
         {/* Glassmorphic Light Card */}
         <div className="bg-white/90 backdrop-blur-xl border border-slate-200/80 py-8 px-6 shadow-2xl rounded-2xl sm:px-10 space-y-6 shadow-slate-200/50">
+          {errorMsg && (
+            <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-semibold leading-relaxed animate-shake">
+              {errorMsg}
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Email Input */}
             <div className="space-y-1.5">
@@ -86,7 +97,10 @@ export default function LoginPage() {
                 <Input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errorMsg) setErrorMsg(null);
+                  }}
                   placeholder="name@company.com"
                   className="pl-11 bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-0 h-11"
                   required
@@ -104,7 +118,10 @@ export default function LoginPage() {
                 <Input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errorMsg) setErrorMsg(null);
+                  }}
                   placeholder="••••••••"
                   className="pl-11 bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-0 h-11"
                   required
