@@ -42,6 +42,7 @@ export function AllocationForm({
     if (initialData) {
       return {
         ...initialData,
+        serverCount: initialData.serverCount || 1,
         goLiveDate: initialData.goLiveDate
           ? new Date(initialData.goLiveDate).toISOString().split('T')[0]
           : new Date().toISOString().split('T')[0],
@@ -56,6 +57,7 @@ export function AllocationForm({
       serverId: '',
       serverName: '',
       capacityGB: 0,
+      serverCount: 1,
       goLiveDate: new Date().toISOString().split('T')[0],
       status: StatusType.ACTIVE,
       notes: '',
@@ -86,6 +88,9 @@ export function AllocationForm({
     if (!formData.serverId) newErrors.serverId = 'Server is required';
     if (!formData.capacityGB || formData.capacityGB <= 0) {
       newErrors.capacityGB = 'Capacity must be greater than 0';
+    }
+    if (!formData.serverCount || formData.serverCount <= 0) {
+      newErrors.serverCount = 'Server quantity must be greater than 0';
     }
     if (!formData.goLiveDate) newErrors.goLiveDate = 'Go live date is required';
 
@@ -349,6 +354,24 @@ export function AllocationForm({
         </Select>
         {errors.serverId && (
           <p className="text-xs text-red-600">{errors.serverId}</p>
+        )}
+      </div>
+
+      {/* Server Quantity Input */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">
+          Server Quantity *
+        </label>
+        <Input
+          type="number"
+          min="1"
+          value={formData.serverCount !== undefined ? formData.serverCount : 1}
+          onChange={(e) => handleChange('serverCount', parseInt(e.target.value) || 1)}
+          placeholder="e.g., 4"
+          className={errors.serverCount ? 'border-red-500' : ''}
+        />
+        {errors.serverCount && (
+          <p className="text-xs text-red-600">{errors.serverCount}</p>
         )}
       </div>
 
