@@ -16,11 +16,14 @@ async function updateServerUsedCapacity(serverId: any) {
 async function updateCacheProviderStats(cacheProviderId: any) {
   if (!cacheProviderId) return;
   const allocations = await Allocation.find({ cacheProviderId, status: 'Active' });
-  const usedServerCount = allocations.length;
-  const usedCapacity = allocations.reduce((sum, a) => sum + a.capacityGB, 0);
+  const serverCount = allocations.reduce((sum, a) => sum + (a.serverCount || 1), 0);
+  const totalCapacity = allocations.reduce((sum, a) => sum + a.capacityGB, 0);
+  
   await CacheProvider.findByIdAndUpdate(cacheProviderId, {
-    usedServerCount,
-    usedCapacity,
+    serverCount,
+    totalCapacity,
+    usedServerCount: serverCount,
+    usedCapacity: totalCapacity,
   });
 }
 
