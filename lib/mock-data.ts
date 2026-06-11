@@ -1,4 +1,4 @@
-import { Company, CacheProvider, Server, Allocation, CompanyType, StatusType } from './types';
+import { Company, CacheProvider, Server, Distribution, CompanyType, StatusType } from './types';
 
 // Mock Companies Data
 export const mockCompanies: Company[] = [
@@ -1681,14 +1681,14 @@ export const mockServers: Server[] = [
   },
 ];
 
-// Mock Allocations Data
-export const mockAllocations: Allocation[] = [];
+// Mock Distributions Data
+export const mockDistributions: Distribution[] = [];
 
 // Helper function to get data
 export const getCompanies = (): Company[] => mockCompanies;
 export const getCacheProviders = (): CacheProvider[] => mockCacheProviders;
 export const getServers = (): Server[] => mockServers;
-export const getAllocations = (): Allocation[] => mockAllocations;
+export const getDistributions = (): Distribution[] => mockDistributions;
 
 // Helper function to find by ID
 export const getCompanyById = (id: string): Company | undefined => {
@@ -1703,6 +1703,6 @@ export const getServerById = (id: string): Server | undefined => {
   return mockServers.find(s => s.id === id);
 };
 
-export const getAllocationById = (id: string): Allocation | undefined => {
-  return mockAllocations.find(a => a.id === id);
+export const getDistributionById = (id: string): Distribution | undefined => {
+  return mockDistributions.find(d => d.id === id);
 };

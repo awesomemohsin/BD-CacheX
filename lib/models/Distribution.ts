@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { StatusType } from '../types';
 
-const AllocationSchema = new Schema(
+const DistributionSchema = new Schema(
   {
     companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true },
     cacheProviderId: { type: Schema.Types.ObjectId, ref: 'CacheProvider', required: true },
@@ -28,4 +28,4 @@ const AllocationSchema = new Schema(
   }
 );
 
-export const Allocation = mongoose.models.Allocation || mongoose.model('Allocation', AllocationSchema);
+export const Distribution = mongoose.models.Distribution || mongoose.model('Distribution', DistributionSchema);

@@ -1,15 +1,15 @@
 import { Company } from './models/Company';
 import { CacheProvider } from './models/CacheProvider';
 import { Server } from './models/Server';
-import { Allocation } from './models/Allocation';
-import { mockCompanies, mockCacheProviders, mockServers, mockAllocations } from './mock-data';
+import { Distribution } from './models/Distribution';
+import { mockCompanies, mockCacheProviders, mockServers, mockDistributions } from './mock-data';
 
 export async function seedDatabase() {
   try {
     const companyCount = await Company.countDocuments();
     const providerCount = await CacheProvider.countDocuments();
     const serverCount = await Server.countDocuments();
-    const allocationCount = await Allocation.countDocuments();
+    const distributionCount = await Distribution.countDocuments();
     
     // Check if Akamai, Virgo, or Asia Intel is missing to detect if we need migration/reseeding
     const hasAkamai = await CacheProvider.findOne({ shortCode: 'Akamai' });
@@ -21,7 +21,7 @@ export async function seedDatabase() {
       await Company.deleteMany({});
       await CacheProvider.deleteMany({});
       await Server.deleteMany({});
-      await Allocation.deleteMany({});
+      await Distribution.deleteMany({});
       
       console.log('--- Starting auto-seeding with mock data ---');
 
@@ -64,44 +64,44 @@ export async function seedDatabase() {
       }
       console.log(`Seeded ${serverMap.size} servers.`);
 
-      // 4. Seed Allocations
-      let seededAllocCount = 0;
-      for (const mockAlloc of mockAllocations) {
-        const { id, companyId, cacheProviderId, serverId, ...data } = mockAlloc;
+      // 4. Seed Distributions
+      let seededDistCount = 0;
+      for (const mockDist of mockDistributions) {
+        const { id, companyId, cacheProviderId, serverId, ...data } = mockDist;
         const realCompanyId = companyMap.get(companyId);
         const realProviderId = providerMap.get(cacheProviderId);
         const realServerId = serverMap.get(serverId);
 
         if (realCompanyId && realProviderId && realServerId) {
-          await Allocation.create({
+          await Distribution.create({
             ...data,
             companyId: realCompanyId,
             cacheProviderId: realProviderId,
             serverId: realServerId,
-            createdAt: mockAlloc.createdAt || new Date(),
-            updatedAt: mockAlloc.updatedAt || new Date(),
+            createdAt: mockDist.createdAt || new Date(),
+            updatedAt: mockDist.updatedAt || new Date(),
           });
-          seededAllocCount++;
+          seededDistCount++;
         }
       }
-      console.log(`Seeded ${seededAllocCount} allocations.`);
+      console.log(`Seeded ${seededDistCount} distributions.`);
 
-      // 5. Recalculate server capacity based on seeded active allocations
+      // 5. Recalculate server capacity based on seeded active distributions
       const serversList = await Server.find({});
       for (const srv of serversList) {
-        const activeAllocations = await Allocation.find({ serverId: srv._id, status: 'Active' });
-        const usedCapacity = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+        const activeDistributions = await Distribution.find({ serverId: srv._id, status: 'Active' });
+        const usedCapacity = activeDistributions.reduce((sum, d) => sum + d.capacityGB, 0);
         srv.usedCapacityGB = usedCapacity;
         await srv.save();
       }
       console.log('Recalculated used capacity for all servers.');
 
-      // 6. Recalculate cache provider stats based on seeded active allocations
+      // 6. Recalculate cache provider stats based on seeded active distributions
       const providersList = await CacheProvider.find({});
       for (const cp of providersList) {
-        const activeAllocations = await Allocation.find({ cacheProviderId: cp._id, status: 'Active' });
-        const serverCount = activeAllocations.reduce((sum, a) => sum + (a.serverCount || 1), 0);
-        const totalCapacity = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+        const activeDistributions = await Distribution.find({ cacheProviderId: cp._id, status: 'Active' });
+        const serverCount = activeDistributions.reduce((sum, d) => sum + (d.serverCount || 1), 0);
+        const totalCapacity = activeDistributions.reduce((sum, d) => sum + d.capacityGB, 0);
         
         cp.serverCount = serverCount;
         cp.totalCapacity = totalCapacity;
@@ -113,12 +113,12 @@ export async function seedDatabase() {
       console.log('--- Seeding completed successfully ---');
     }
 
-    // ALWAYS recalculate and sync capacities and quantities on startup to ensure stats are in sync with live allocations
-    console.log('--- Syncing cache provider and server statistics with database allocations ---');
+    // ALWAYS recalculate and sync capacities and quantities on startup to ensure stats are in sync with live distributions
+    console.log('--- Syncing cache provider and server statistics with database distributions ---');
     const serversList = await Server.find({});
     for (const srv of serversList) {
-      const activeAllocations = await Allocation.find({ serverId: srv._id, status: 'Active' });
-      const usedCapacity = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+      const activeDistributions = await Distribution.find({ serverId: srv._id, status: 'Active' });
+      const usedCapacity = activeDistributions.reduce((sum, d) => sum + d.capacityGB, 0);
       if (srv.usedCapacityGB !== usedCapacity) {
         srv.usedCapacityGB = usedCapacity;
         await srv.save();
@@ -127,9 +127,9 @@ export async function seedDatabase() {
 
     const providersList = await CacheProvider.find({});
     for (const cp of providersList) {
-      const activeAllocations = await Allocation.find({ cacheProviderId: cp._id, status: 'Active' });
-      const serverCountVal = activeAllocations.reduce((sum, a) => sum + (a.serverCount || 1), 0);
-      const totalCapacityVal = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+      const activeDistributions = await Distribution.find({ cacheProviderId: cp._id, status: 'Active' });
+      const serverCountVal = activeDistributions.reduce((sum, d) => sum + (d.serverCount || 1), 0);
+      const totalCapacityVal = activeDistributions.reduce((sum, d) => sum + d.capacityGB, 0);
 
       if (
         cp.serverCount !== serverCountVal ||

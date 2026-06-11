@@ -60,8 +60,8 @@ export interface Server {
   updatedAt: Date;
 }
 
-// Allocation Type
-export interface Allocation {
+// Distribution Type
+export interface Distribution {
   id: string;
   companyId: string;
   companyName: string;
@@ -79,6 +79,9 @@ export interface Allocation {
   updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
+  company?: Company;
+  cacheProvider?: CacheProvider;
+  server?: Server;
 }
 
 // API Response Types
