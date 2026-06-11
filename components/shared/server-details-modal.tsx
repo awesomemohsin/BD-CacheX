@@ -160,12 +160,12 @@ export function ServerDetailsModal({
                     <tr key={alloc.id} className="hover:bg-slate-50/50">
                       <td className="px-4 py-2.5">
                         <a
-                          href={`/dashboard/allocations?id=${alloc.id}`}
+                          href={`/dashboard/allocations?id=${alloc.id.substring(0, 6)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline hover:text-blue-700 font-mono font-medium"
                         >
-                          {alloc.id.substring(0, 8)}...
+                          {alloc.id.substring(0, 6)}
                         </a>
                       </td>
                       <td className="px-4 py-2.5 font-medium text-slate-800">{alloc.companyName}</td>

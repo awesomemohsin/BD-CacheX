@@ -62,12 +62,12 @@ export default function NewAllocationPage() {
               <p className="mt-1 text-xs text-red-700">
                 Reference ID:{' '}
                 <a
-                  href={`/dashboard/allocations?id=${errorState.duplicateId}`}
+                  href={`/dashboard/allocations?id=${errorState.duplicateId.substring(0, 6)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono underline hover:text-red-900 font-semibold"
                 >
-                  {errorState.duplicateId}
+                  {errorState.duplicateId.substring(0, 6)}
                 </a>
               </p>
             )}

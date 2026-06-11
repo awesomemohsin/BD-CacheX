@@ -234,8 +234,8 @@ export function AllocationsTable({ isDashboard = false }: AllocationsTableProps)
             <tbody className="divide-y divide-slate-100 bg-white">
               {filteredAllocations.map((allocation) => (
                 <tr key={allocation.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-xs text-slate-500" title={allocation.id}>
-                    {allocation.id.substring(0, 8)}...
+                  <td className="px-6 py-4 font-mono text-xs text-slate-500 font-semibold" title={allocation.id}>
+                    {allocation.id.substring(0, 6)}
                   </td>
                   <td className="px-6 py-4 font-semibold text-slate-800">
                     {allocation.companyName}

@@ -31,7 +31,7 @@ export function AllocationDetailsModal({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full">
-              Distribution ID: {allocation.id}
+              Distribution ID: {allocation.id.substring(0, 6)}
             </span>
             <StatusBadge status={allocation.status} />
           </div>
