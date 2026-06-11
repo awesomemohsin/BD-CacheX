@@ -16,13 +16,7 @@ export async function seedDatabase() {
     const hasVirgo = await Company.findOne({ name: 'Virgo Communications Limited' });
     const hasAsiaIntel = await Company.findOne({ name: 'Asia Intel Communications' });
 
-    // Check if cache provider capacities match the new list
-    const providers = await CacheProvider.find({});
-    const dbTotalCapacity = providers.reduce((sum, p) => sum + (p.totalCapacity || 0), 0);
-    const expectedTotalCapacity = 3908.1;
-    const capacityMatches = Math.abs(dbTotalCapacity - expectedTotalCapacity) < 0.1;
-
-    if (companyCount !== 143 || providerCount === 0 || serverCount === 0 || !hasAkamai || !hasVirgo || !hasAsiaIntel || !capacityMatches) {
+    if (companyCount !== 143 || providerCount === 0 || serverCount === 0 || !hasAkamai || !hasVirgo || !hasAsiaIntel) {
       console.log('--- DB needs seeding/reseeding, clearing collections ---');
       await Company.deleteMany({});
       await CacheProvider.deleteMany({});
@@ -118,6 +112,39 @@ export async function seedDatabase() {
       console.log('Recalculated server count and capacity for all cache providers.');
       console.log('--- Seeding completed successfully ---');
     }
+
+    // ALWAYS recalculate and sync capacities and quantities on startup to ensure stats are in sync with live allocations
+    console.log('--- Syncing cache provider and server statistics with database allocations ---');
+    const serversList = await Server.find({});
+    for (const srv of serversList) {
+      const activeAllocations = await Allocation.find({ serverId: srv._id, status: 'Active' });
+      const usedCapacity = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+      if (srv.usedCapacityGB !== usedCapacity) {
+        srv.usedCapacityGB = usedCapacity;
+        await srv.save();
+      }
+    }
+
+    const providersList = await CacheProvider.find({});
+    for (const cp of providersList) {
+      const activeAllocations = await Allocation.find({ cacheProviderId: cp._id, status: 'Active' });
+      const serverCountVal = activeAllocations.reduce((sum, a) => sum + (a.serverCount || 1), 0);
+      const totalCapacityVal = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+
+      if (
+        cp.serverCount !== serverCountVal ||
+        cp.totalCapacity !== totalCapacityVal ||
+        cp.usedServerCount !== serverCountVal ||
+        cp.usedCapacity !== totalCapacityVal
+      ) {
+        cp.serverCount = serverCountVal;
+        cp.totalCapacity = totalCapacityVal;
+        cp.usedServerCount = serverCountVal;
+        cp.usedCapacity = totalCapacityVal;
+        await cp.save();
+      }
+    }
+    console.log('--- Cache statistics synced successfully ---');
   } catch (error) {
     console.error('Failed to seed database:', error);
   }

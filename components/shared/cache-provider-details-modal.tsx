@@ -66,7 +66,7 @@ export function CacheProviderDetailsModal({
                 <Database className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Storage Capacity</p>
+                <p className="text-[10px] text-slate-500 uppercase font-semibold">Capacity Used</p>
                 <p className="text-lg font-bold text-slate-900 mt-0.5">{formatCapacity(totalCap)}</p>
               </div>
             </div>
@@ -79,7 +79,7 @@ export function CacheProviderDetailsModal({
                 <Server className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] text-slate-500 uppercase font-semibold">Servers Quantity</p>
+                <p className="text-[10px] text-slate-500 uppercase font-semibold">Server Used</p>
                 <p className="text-lg font-bold text-slate-900 mt-0.5">{totalSrv} pcs</p>
               </div>
             </div>

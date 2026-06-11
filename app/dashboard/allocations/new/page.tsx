@@ -7,10 +7,12 @@ import { AllocationForm } from '@/components/forms/allocation-form';
 import { Card, CardContent } from '@/components/ui/card';
 import { Allocation } from '@/lib/types';
 import { toast } from 'sonner';
+import { AlertCircle } from 'lucide-react';
 
 export default function NewAllocationPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorState, setErrorState] = useState<{ message: string; duplicateId?: string } | null>(null);
 
   useEffect(() => {
     document.title = 'New Distribution | BD CacheX';
@@ -18,6 +20,7 @@ export default function NewAllocationPage() {
 
   const handleSubmit = async (data: Partial<Allocation>) => {
     setIsLoading(true);
+    setErrorState(null);
     try {
       const res = await fetch('/api/allocations', {
         method: 'POST',
@@ -33,6 +36,7 @@ export default function NewAllocationPage() {
         });
         router.push('/dashboard/allocations');
       } else {
+        setErrorState({ message: result.error || 'Failed to create distribution', duplicateId: result.duplicateId });
         toast.error(result.error || 'Failed to create distribution');
       }
     } catch (error) {
@@ -48,6 +52,28 @@ export default function NewAllocationPage() {
         title="Create New Distribution"
         description="Distribute cache capacity to a company"
       />
+
+      {errorState && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-800">
+          <AlertCircle className="w-5 h-5 shrink-0 text-red-600 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-semibold">{errorState.message}</p>
+            {errorState.duplicateId && (
+              <p className="mt-1 text-xs text-red-700">
+                Reference ID:{' '}
+                <a
+                  href={`/dashboard/allocations?id=${errorState.duplicateId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono underline hover:text-red-900 font-semibold"
+                >
+                  {errorState.duplicateId}
+                </a>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <Card>
         <CardContent className="pt-6">

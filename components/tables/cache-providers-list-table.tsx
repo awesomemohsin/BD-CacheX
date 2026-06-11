@@ -128,8 +128,8 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
               <tr className="border-b border-slate-100 bg-slate-50/75 text-xs font-semibold uppercase tracking-wider text-slate-500">
                 <th className="px-6 py-4">Provider Name</th>
                 <th className="px-6 py-4">Short Code</th>
-                <th className="px-6 py-4 text-center">Server Qty</th>
-                <th className="px-6 py-4 text-right">Capacity</th>
+                <th className="px-6 py-4 text-center">SERVER USED</th>
+                <th className="px-6 py-4 text-right">Capacity Used</th>
                 <th className="px-6 py-4">Description</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Created</th>

@@ -61,6 +61,31 @@ export async function POST(request: Request) {
     await dbConnect();
     const body = await request.json();
 
+    // Duplicate distribution query check (same server, same capacity, same go-live date)
+    const goLiveDate = new Date(body.goLiveDate);
+    const startOfDay = new Date(goLiveDate.getFullYear(), goLiveDate.getMonth(), goLiveDate.getDate());
+    const endOfDay = new Date(goLiveDate.getFullYear(), goLiveDate.getMonth(), goLiveDate.getDate(), 23, 59, 59, 999);
+
+    const duplicate = await Allocation.findOne({
+      serverId: body.serverId,
+      capacityGB: Number(body.capacityGB),
+      goLiveDate: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    });
+
+    if (duplicate) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Duplicate distribution data found.',
+          duplicateId: duplicate._id.toString(),
+        },
+        { status: 409 }
+      );
+    }
+
     const [company, provider, server] = await Promise.all([
       Company.findById(body.companyId),
       CacheProvider.findById(body.cacheProviderId),
