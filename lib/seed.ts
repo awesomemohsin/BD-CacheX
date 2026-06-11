@@ -16,7 +16,13 @@ export async function seedDatabase() {
     const hasVirgo = await Company.findOne({ name: 'Virgo Communications Limited' });
     const hasAsiaIntel = await Company.findOne({ name: 'Asia Intel Communications' });
 
-    if (companyCount !== 143 || providerCount === 0 || serverCount === 0 || !hasAkamai || !hasVirgo || !hasAsiaIntel) {
+    // Check if cache provider capacities match the new list
+    const providers = await CacheProvider.find({});
+    const dbTotalCapacity = providers.reduce((sum, p) => sum + (p.totalCapacity || 0), 0);
+    const expectedTotalCapacity = 3908.1;
+    const capacityMatches = Math.abs(dbTotalCapacity - expectedTotalCapacity) < 0.1;
+
+    if (companyCount !== 143 || providerCount === 0 || serverCount === 0 || !hasAkamai || !hasVirgo || !hasAsiaIntel || !capacityMatches) {
       console.log('--- DB needs seeding/reseeding, clearing collections ---');
       await Company.deleteMany({});
       await CacheProvider.deleteMany({});
@@ -95,6 +101,16 @@ export async function seedDatabase() {
         await srv.save();
       }
       console.log('Recalculated used capacity for all servers.');
+
+      // 6. Recalculate cache provider stats based on seeded active allocations
+      const providersList = await CacheProvider.find({});
+      for (const cp of providersList) {
+        const activeAllocations = await Allocation.find({ cacheProviderId: cp._id, status: 'Active' });
+        cp.usedServerCount = activeAllocations.length;
+        cp.usedCapacity = activeAllocations.reduce((sum, a) => sum + a.capacityGB, 0);
+        await cp.save();
+      }
+      console.log('Recalculated server count and capacity for all cache providers.');
       console.log('--- Seeding completed successfully ---');
     }
   } catch (error) {

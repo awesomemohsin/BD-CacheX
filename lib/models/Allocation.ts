@@ -10,6 +10,8 @@ const AllocationSchema = new Schema(
     goLiveDate: { type: Date, required: true },
     status: { type: String, enum: Object.values(StatusType), default: StatusType.ACTIVE, required: true },
     notes: { type: String },
+    createdBy: { type: String, default: 'system@bdcache.com' },
+    updatedBy: { type: String, default: 'system@bdcache.com' },
   },
   {
     timestamps: true,

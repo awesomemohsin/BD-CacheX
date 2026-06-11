@@ -18,6 +18,8 @@ export interface Company {
   email: string;
   address?: string;
   status: StatusType;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +33,10 @@ export interface CacheProvider {
   status: StatusType;
   serverCount?: number;
   totalCapacity?: number;
+  usedServerCount?: number;
+  usedCapacity?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,6 +54,8 @@ export interface Server {
   ipAddress: string;
   status: StatusType;
   notes?: string;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -66,6 +74,8 @@ export interface Allocation {
   goLiveDate: Date;
   status: StatusType;
   notes?: string;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -85,4 +95,23 @@ export interface PaginatedResponse<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+export interface ActivityLog {
+  id: string;
+  action: string;
+  entity: string;
+  details: string;
+  userEmail: string;
+  createdAt: Date;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  phone?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

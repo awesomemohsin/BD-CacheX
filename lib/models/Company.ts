@@ -8,6 +8,8 @@ const CompanySchema = new Schema(
     email: { type: String, required: true },
     address: { type: String },
     status: { type: String, enum: Object.values(StatusType), default: StatusType.ACTIVE, required: true },
+    createdBy: { type: String, default: 'system@bdcache.com' },
+    updatedBy: { type: String, default: 'system@bdcache.com' },
   },
   {
     timestamps: true,

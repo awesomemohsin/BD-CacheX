@@ -13,6 +13,8 @@ const ServerSchema = new Schema(
     ipAddress: { type: String, required: true },
     status: { type: String, enum: Object.values(StatusType), default: StatusType.ACTIVE, required: true },
     notes: { type: String },
+    createdBy: { type: String, default: 'system@bdcache.com' },
+    updatedBy: { type: String, default: 'system@bdcache.com' },
   },
   {
     timestamps: true,

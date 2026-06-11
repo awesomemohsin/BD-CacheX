@@ -9,6 +9,10 @@ const CacheProviderSchema = new Schema(
     status: { type: String, enum: Object.values(StatusType), default: StatusType.ACTIVE, required: true },
     serverCount: { type: Number, default: 0 },
     totalCapacity: { type: Number, default: 0 },
+    usedServerCount: { type: Number, default: 0 },
+    usedCapacity: { type: Number, default: 0 },
+    createdBy: { type: String, default: 'system@bdcache.com' },
+    updatedBy: { type: String, default: 'system@bdcache.com' },
   },
   {
     timestamps: true,
