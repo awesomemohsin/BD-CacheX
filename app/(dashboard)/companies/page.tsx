@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { CompaniesListTable } from '@/components/tables/companies-list-table';
 import { CompanyModal } from '@/components/shared/company-modal';
@@ -11,6 +11,10 @@ import { Company } from '@/lib/types';
 export default function CompaniesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+
+  useEffect(() => {
+    document.title = 'Companies | BD CacheX';
+  }, []);
 
   const handleAddClick = () => {
     setSelectedCompany(null);

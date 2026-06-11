@@ -11,6 +11,7 @@ import { formatDateString } from '@/lib/utils';
 import { Edit2, Trash2, Eye, Search } from 'lucide-react';
 import { Company } from '@/lib/types';
 import { toast } from 'sonner';
+import { CompanyDetailsModal } from '@/components/shared/company-details-modal';
 
 import {
   Select,
@@ -29,6 +30,15 @@ export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState<Company | null>(null);
+  const [viewTarget, setViewTarget] = useState<Company | null>(null);
+
+  const handleTypeFilterChange = (value: string | null) => {
+    setTypeFilter(value || 'all');
+  };
+
+  const handleStatusFilterChange = (value: string | null) => {
+    setStatusFilter(value || 'all');
+  };
   
   const { data: companies = [], error, isLoading, mutate } = useSWR<Company[]>('/api/companies', fetcher);
   
@@ -91,25 +101,27 @@ export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
             />
           </div>
           <div className="flex gap-3">
-            <div className="w-[140px]">
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <div className="w-[155px]">
+              <Select value={typeFilter} onValueChange={handleTypeFilterChange}>
                 <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Types" />
+                  <span className="text-slate-400 mr-1 font-medium">Type:</span>
+                  <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="ISP">ISP</SelectItem>
                   <SelectItem value="IIG">IIG</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="w-[140px]">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <div className="w-[170px]">
+              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
                 <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Statuses" />
+                  <span className="text-slate-400 mr-1 font-medium">Status:</span>
+                  <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Pending">Pending</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
@@ -173,7 +185,10 @@ export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all">
+                      <button 
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all"
+                        onClick={() => setViewTarget(company)}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -205,6 +220,12 @@ export function CompaniesListTable({ onEdit }: CompaniesListTableProps) {
         itemName={deleteTarget?.name}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+      {/* View Details Modal */}
+      <CompanyDetailsModal
+        open={!!viewTarget}
+        company={viewTarget}
+        onClose={() => setViewTarget(null)}
       />
     </div>
   );

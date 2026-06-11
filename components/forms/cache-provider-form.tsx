@@ -149,7 +149,7 @@ export function CacheProviderForm({
         <label className="text-sm font-medium text-slate-700">Status</label>
         <Select
           value={formData.status}
-          onValueChange={(value) => handleChange('status', value)}
+          onValueChange={(value) => handleChange('status', value ?? StatusType.ACTIVE)}
         >
           <SelectTrigger>
             <SelectValue />

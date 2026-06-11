@@ -11,6 +11,8 @@ import { formatDateString, formatCapacity } from '@/lib/utils';
 import { Edit2, Trash2, Eye, Search } from 'lucide-react';
 import { Allocation } from '@/lib/types';
 import { toast } from 'sonner';
+import { useSearchParams } from 'next/navigation';
+import { AllocationDetailsModal } from '@/components/shared/allocation-details-modal';
 
 import {
   Select,
@@ -20,13 +22,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export function AllocationsTable() {
-  const [searchQuery, setSearchQuery] = useState('');
+interface AllocationsTableProps {
+  isDashboard?: boolean;
+}
+
+export function AllocationsTable({ isDashboard = false }: AllocationsTableProps) {
+  const searchParams = useSearchParams();
+  const initialIdQuery = searchParams ? (searchParams.get('id') || '') : '';
+
+  const [searchQuery, setSearchQuery] = useState(initialIdQuery);
   const [companyTypeFilter, setCompanyTypeFilter] = useState('all');
   const [providerFilter, setProviderFilter] = useState('all');
   const [serverFilter, setServerFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState<Allocation | null>(null);
+  const [viewTarget, setViewTarget] = useState<Allocation | null>(null);
   
   const { data: allocations = [], error, isLoading, mutate } = useSWR<Allocation[]>('/api/allocations', fetcher);
   
@@ -105,72 +115,90 @@ export function AllocationsTable() {
   return (
     <div>
       {/* Search Bar */}
-      <div className="p-6 border-b border-slate-200">
-        <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              placeholder="Search by company, provider, server, or ID..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-slate-50"
-            />
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <div className="w-[130px]">
-              <Select value={companyTypeFilter} onValueChange={setCompanyTypeFilter}>
-                <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="ISP">ISP</SelectItem>
-                  <SelectItem value="IIG">IIG</SelectItem>
-                </SelectContent>
-              </Select>
+      {!isDashboard && (
+        <div className="p-6 border-b border-slate-200">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Search by company, provider, server, or ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-slate-50"
+              />
             </div>
-            <div className="w-[150px]">
-              <Select value={providerFilter} onValueChange={setProviderFilter}>
-                <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Providers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Providers</SelectItem>
-                  {uniqueProviders.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-[150px]">
-              <Select value={serverFilter} onValueChange={setServerFilter}>
-                <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Servers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Servers</SelectItem>
-                  {uniqueServers.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-[130px]">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Statuses" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex flex-wrap gap-3">
+              <div className="w-[155px]">
+                <Select value={companyTypeFilter} onValueChange={(value) => setCompanyTypeFilter(value || 'all')}>
+                  <SelectTrigger className="bg-slate-50">
+                    <span className="text-slate-400 mr-1 font-medium">Type:</span>
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="ISP">ISP</SelectItem>
+                    <SelectItem value="IIG">IIG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-[185px]">
+                <Select value={providerFilter} onValueChange={(value) => setProviderFilter(value || 'all')}>
+                  <SelectTrigger className="bg-slate-50">
+                    <span className="text-slate-400 mr-1 font-medium">Provider:</span>
+                    <SelectValue placeholder="All">
+                      {(val) => {
+                        if (val === 'all') return 'All';
+                        const p = uniqueProviders.find((cp) => cp.id === val);
+                        return p ? p.name : val;
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    {uniqueProviders.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-[185px]">
+                <Select value={serverFilter} onValueChange={(value) => setServerFilter(value || 'all')}>
+                  <SelectTrigger className="bg-slate-50">
+                    <span className="text-slate-400 mr-1 font-medium">Server:</span>
+                    <SelectValue placeholder="All">
+                      {(val) => {
+                        if (val === 'all') return 'All';
+                        const s = uniqueServers.find((srv) => srv.id === val);
+                        return s ? s.name : val;
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    {uniqueServers.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-[170px]">
+                <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value || 'all')}>
+                  <SelectTrigger className="bg-slate-50">
+                    <span className="text-slate-400 mr-1 font-medium">Status:</span>
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Table */}
       {isLoading ? (
@@ -206,8 +234,8 @@ export function AllocationsTable() {
             <tbody className="divide-y divide-slate-100 bg-white">
               {filteredAllocations.map((allocation) => (
                 <tr key={allocation.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-xs text-slate-500">
-                    {allocation.id}
+                  <td className="px-6 py-4 font-mono text-xs text-slate-500" title={allocation.id}>
+                    {allocation.id.substring(0, 8)}...
                   </td>
                   <td className="px-6 py-4 font-semibold text-slate-800">
                     {allocation.companyName}
@@ -230,7 +258,10 @@ export function AllocationsTable() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all">
+                      <button 
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all"
+                        onClick={() => setViewTarget(allocation)}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all">
@@ -259,6 +290,12 @@ export function AllocationsTable() {
         itemName={deleteTarget?.id}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+      {/* View Details Modal */}
+      <AllocationDetailsModal
+        open={!!viewTarget}
+        allocation={viewTarget}
+        onClose={() => setViewTarget(null)}
       />
     </div>
   );

@@ -1,4 +1,3 @@
-import { Progress } from '@/components/ui/progress';
 import { calculateCapacityPercentage, formatCapacity } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/shared/page-header';
 import { AllocationForm } from '@/components/forms/allocation-form';
@@ -11,6 +11,10 @@ import { toast } from 'sonner';
 export default function NewAllocationPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = 'New Distribution | BD CacheX';
+  }, []);
 
   const handleSubmit = async (data: Partial<Allocation>) => {
     setIsLoading(true);

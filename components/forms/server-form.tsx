@@ -175,7 +175,7 @@ export function ServerForm({
                 } else {
                   setFormData((prev) => ({
                     ...prev,
-                    brand: value,
+                    brand: value ?? '',
                     model: '',
                   }));
                   if (errors.brand) {
@@ -235,7 +235,7 @@ export function ServerForm({
                   setIsCustomModel(true);
                   setFormData((prev) => ({ ...prev, model: '' }));
                 } else {
-                  handleChange('model', value);
+                  handleChange('model', value ?? '');
                 }
               }}
               disabled={!formData.brand}
@@ -352,7 +352,7 @@ export function ServerForm({
         <label className="text-sm font-medium text-slate-700">Status</label>
         <Select
           value={formData.status}
-          onValueChange={(value) => handleChange('status', value)}
+          onValueChange={(value) => handleChange('status', value ?? StatusType.ACTIVE)}
         >
           <SelectTrigger>
             <SelectValue />

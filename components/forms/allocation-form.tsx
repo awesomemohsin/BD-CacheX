@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Allocation, StatusType } from '@/lib/types';
+import { Allocation, StatusType, CompanyType } from '@/lib/types';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronDown, Search, Check } from 'lucide-react';
+import { cn, formatCapacity } from '@/lib/utils';
+
+interface FormState extends Omit<Partial<Allocation>, 'goLiveDate'> {
+  goLiveDate: string;
+}
 
 interface AllocationFormProps {
   initialData?: Allocation;
@@ -33,8 +38,16 @@ export function AllocationForm({
 
   const isLoadingData = loadingComp || loadingCp || loadingSrv;
 
-  const [formData, setFormData] = useState<Partial<Allocation>>(
-    initialData || {
+  const [formData, setFormData] = useState<FormState>(() => {
+    if (initialData) {
+      return {
+        ...initialData,
+        goLiveDate: initialData.goLiveDate
+          ? new Date(initialData.goLiveDate).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0],
+      };
+    }
+    return {
       companyId: '',
       companyName: '',
       companyType: undefined,
@@ -46,16 +59,27 @@ export function AllocationForm({
       goLiveDate: new Date().toISOString().split('T')[0],
       status: StatusType.ACTIVE,
       notes: '',
-    }
-  );
+    };
+  });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [companySearch, setCompanySearch] = useState('');
+  const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
 
   const selectedCompany = companies.find((c) => c.id === formData.companyId);
+
+  const filteredCompanies = companies.filter((c) => {
+    const matchesType = !formData.companyType || c.type === formData.companyType;
+    const matchesSearch =
+      !companySearch.trim() ||
+      c.name.toLowerCase().includes(companySearch.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
+    if (!formData.companyType) newErrors.companyType = 'Company type is required';
     if (!formData.companyId) newErrors.companyId = 'Company is required';
     if (!formData.cacheProviderId)
       newErrors.cacheProviderId = 'Cache provider is required';
@@ -72,36 +96,45 @@ export function AllocationForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onSubmit(formData);
+      onSubmit({
+        ...formData,
+        goLiveDate: new Date(formData.goLiveDate),
+      });
     }
   };
 
-  const handleChange = (field: string, value: string | number) => {
+  const handleChange = (field: string, value: any) => {
+    const safeValue = value ?? '';
     if (field === 'companyId') {
-      const company = companies.find((c) => c.id === value);
+      const company = companies.find((c) => c.id === safeValue);
       setFormData((prev) => ({
         ...prev,
-        companyId: value,
+        companyId: safeValue,
         companyName: company?.name || '',
         companyType: company?.type,
       }));
+      setIsCompanyDropdownOpen(false);
     } else {
       if (field === 'cacheProviderId') {
-        const provider = cacheProviders.find((cp) => cp.id === value);
+        const provider = cacheProviders.find((cp) => cp.id === safeValue);
         setFormData((prev) => ({
           ...prev,
-          cacheProviderId: value,
-          cacheProviderName: provider?.name || '',
+          cacheProviderId: safeValue,
+          cacheProviderName: provider ? `${provider.shortCode} - ${provider.name}` : '',
         }));
       } else if (field === 'serverId') {
-        const server = servers.find((s) => s.id === value);
+        const server = servers.find((s) => s.id === safeValue);
+        const rackStr = server?.rackNumber ? ` / ${server.rackNumber}` : '';
+        const formattedName = server
+          ? `${server.brand} - ${server.model} - ${server.name} - ${server.location}${rackStr}`
+          : '';
         setFormData((prev) => ({
           ...prev,
-          serverId: value,
-          serverName: server?.name || '',
+          serverId: safeValue,
+          serverName: formattedName,
         }));
       } else {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+        setFormData((prev) => ({ ...prev, [field]: safeValue }));
       }
     }
 
@@ -121,36 +154,124 @@ export function AllocationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Company Selection */}
+      {/* Company Type Selection */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-700">
-          Company *
+          Company Type *
         </label>
-        <Select value={formData.companyId} onValueChange={(value) => handleChange('companyId', value)}>
-          <SelectTrigger className={errors.companyId ? 'border-red-500' : ''}>
-            <SelectValue placeholder="Select a company" />
+        <Select
+          value={formData.companyType || ''}
+          onValueChange={(value) => {
+            const newType = value as CompanyType || undefined;
+            setFormData((prev) => ({
+              ...prev,
+              companyType: newType,
+              companyId: '',
+              companyName: '',
+            }));
+            setCompanySearch('');
+          }}
+        >
+          <SelectTrigger className={errors.companyType ? 'border-red-500' : ''}>
+            <SelectValue placeholder="Select type (ISP / IIG)">
+              {(val) => val}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id}>
-                {company.name} ({company.type})
-              </SelectItem>
-            ))}
+            <SelectItem value="ISP">ISP</SelectItem>
+            <SelectItem value="IIG">IIG</SelectItem>
           </SelectContent>
         </Select>
-        {errors.companyId && (
-          <p className="text-xs text-red-600">{errors.companyId}</p>
+        {errors.companyType && (
+          <p className="text-xs text-red-650">{errors.companyType}</p>
         )}
       </div>
 
-      {/* Company Type (Auto-populated) */}
-      {selectedCompany && (
-        <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-          <p className="text-sm text-slate-600">
-            Company Type: <span className="font-semibold">{selectedCompany.type}</span>
-          </p>
-        </div>
-      )}
+      {/* Company Selection */}
+      <div className="space-y-2 relative">
+        <label className="text-sm font-medium text-slate-700">
+          Company *
+        </label>
+        
+        {/* Custom Select Trigger */}
+        <button
+          type="button"
+          disabled={!formData.companyType}
+          onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
+          className={cn(
+            "flex w-full items-center justify-between gap-1.5 rounded-lg border bg-white py-2 pr-2 pl-2.5 text-sm transition-colors outline-none select-none disabled:cursor-not-allowed disabled:opacity-50 h-8",
+            errors.companyId ? "border-red-500" : "border-slate-200 hover:border-slate-300"
+          )}
+        >
+          <span className={cn(!formData.companyId && "text-slate-400")}>
+            {formData.companyId
+              ? `${formData.companyName} (${formData.companyType})`
+              : formData.companyType
+              ? "Select a company"
+              : "Select company type first"}
+          </span>
+          <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+        </button>
+
+        {/* Custom Popover Content */}
+        {isCompanyDropdownOpen && formData.companyType && (
+          <>
+            {/* Backdrop to close dropdown when clicking outside */}
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setIsCompanyDropdownOpen(false)}
+            />
+            
+            {/* Dropdown Menu */}
+            <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-md z-50 max-h-72 flex flex-col overflow-hidden">
+              {/* Search Box */}
+              <div className="p-2 border-b border-slate-100 bg-slate-50">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <Input
+                    placeholder="Search company..."
+                    value={companySearch}
+                    onChange={(e) => setCompanySearch(e.target.value)}
+                    className="pl-8 h-8 text-xs bg-white focus:ring-0"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div className="overflow-y-auto py-1 max-h-56">
+                {filteredCompanies.map((company) => (
+                  <button
+                    key={company.id}
+                    type="button"
+                    onClick={() => {
+                      handleChange('companyId', company.id);
+                    }}
+                    className={cn(
+                      "w-full text-left px-3 py-2 text-sm hover:bg-slate-50 flex items-center justify-between transition-colors",
+                      formData.companyId === company.id && "bg-slate-50 font-medium text-blue-600"
+                    )}
+                  >
+                    <span>{company.name}</span>
+                    {formData.companyId === company.id && (
+                      <Check className="w-4 h-4 text-blue-600" />
+                    )}
+                  </button>
+                ))}
+                {filteredCompanies.length === 0 && (
+                  <div className="p-4 text-xs text-slate-500 text-center">
+                    No companies found
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+        
+        {errors.companyId && (
+          <p className="text-xs text-red-650">{errors.companyId}</p>
+        )}
+      </div>
 
       {/* Cache Provider Selection */}
       <div className="space-y-2">
@@ -162,14 +283,29 @@ export function AllocationForm({
           onValueChange={(value) => handleChange('cacheProviderId', value)}
         >
           <SelectTrigger className={errors.cacheProviderId ? 'border-red-500' : ''}>
-            <SelectValue placeholder="Select a cache provider" />
+            <SelectValue placeholder="Select a cache provider">
+              {(val) => {
+                const provider = cacheProviders.find((cp) => cp.id === val);
+                return provider ? `${provider.shortCode} - ${provider.name}` : undefined;
+              }}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            {cacheProviders.map((provider) => (
-              <SelectItem key={provider.id} value={provider.id}>
-                {provider.name} ({provider.shortCode})
-              </SelectItem>
-            ))}
+            {cacheProviders.map((provider) => {
+              const totalCap = provider.totalCapacity ?? 0;
+              const usedCap = provider.usedCapacity ?? 0;
+              const freeCap = Math.max(0, totalCap - usedCap);
+
+              const totalSrv = provider.serverCount ?? 0;
+              const usedSrv = provider.usedServerCount ?? 0;
+              const freeSrv = Math.max(0, totalSrv - usedSrv);
+
+              return (
+                <SelectItem key={provider.id} value={provider.id}>
+                  {provider.shortCode} - {provider.name} (Free: {formatCapacity(freeCap)} / Qty: {freeSrv} | Original: {formatCapacity(totalCap)} / Qty: {totalSrv})
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         {errors.cacheProviderId && (
@@ -187,14 +323,28 @@ export function AllocationForm({
           onValueChange={(value) => handleChange('serverId', value)}
         >
           <SelectTrigger className={errors.serverId ? 'border-red-500' : ''}>
-            <SelectValue placeholder="Select a server" />
+            <SelectValue placeholder="Select a server">
+              {(val) => {
+                const srv = servers.find((s) => s.id === val);
+                if (!srv) return undefined;
+                const rackStr = srv.rackNumber ? ` / ${srv.rackNumber}` : '';
+                return `${srv.brand} - ${srv.model} - ${srv.name} - ${srv.location}${rackStr}`;
+              }}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            {servers.map((server) => (
-              <SelectItem key={server.id} value={server.id}>
-                {server.name} ({server.location})
-              </SelectItem>
-            ))}
+            {servers.map((server) => {
+              const rackStr = server.rackNumber ? ` / ${server.rackNumber}` : '';
+              const totalCap = server.totalCapacityGB ?? 0;
+              const usedCap = server.usedCapacityGB ?? 0;
+              const freeCap = Math.max(0, totalCap - usedCap);
+
+              return (
+                <SelectItem key={server.id} value={server.id}>
+                  {server.brand} - {server.model} - {server.name} - {server.location}{rackStr} (Free: {formatCapacity(freeCap)} | Original: {formatCapacity(totalCap)})
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         {errors.serverId && (

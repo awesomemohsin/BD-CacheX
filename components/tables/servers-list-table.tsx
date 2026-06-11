@@ -12,6 +12,7 @@ import { formatCapacity } from '@/lib/utils';
 import { Edit2, Trash2, Eye, Search } from 'lucide-react';
 import { Server } from '@/lib/types';
 import { toast } from 'sonner';
+import { ServerDetailsModal } from '@/components/shared/server-details-modal';
 
 import {
   Select,
@@ -31,6 +32,7 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
   const [modelFilter, setModelFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState<Server | null>(null);
+  const [viewTarget, setViewTarget] = useState<Server | null>(null);
   
   const { data: servers = [], error, isLoading, mutate } = useSWR<Server[]>('/api/servers', fetcher);
   
@@ -47,8 +49,8 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
     )
   );
 
-  const handleBrandChange = (value: string) => {
-    setBrandFilter(value);
+  const handleBrandChange = (value: string | null) => {
+    setBrandFilter(value || 'all');
     setModelFilter('all');
   };
 
@@ -111,39 +113,42 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
             />
           </div>
           <div className="flex flex-wrap gap-3">
-            <div className="w-[140px]">
+            <div className="w-[155px]">
               <Select value={brandFilter} onValueChange={handleBrandChange}>
                 <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Brands" />
+                  <span className="text-slate-400 mr-1 font-medium">Brand:</span>
+                  <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Brands</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   {uniqueBrands.map((b) => (
                     <SelectItem key={b} value={b}>{b}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="w-[140px]">
-              <Select value={modelFilter} onValueChange={setModelFilter}>
+            <div className="w-[175px]">
+              <Select value={modelFilter} onValueChange={(value) => setModelFilter(value || 'all')}>
                 <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Models" />
+                  <span className="text-slate-400 mr-1 font-medium">Model:</span>
+                  <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Models</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   {uniqueModels.map((m) => (
                     <SelectItem key={m} value={m}>{m}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="w-[140px]">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <div className="w-[170px]">
+              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value || 'all')}>
                 <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Statuses" />
+                  <span className="text-slate-400 mr-1 font-medium">Status:</span>
+                  <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Pending">Pending</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
@@ -210,7 +215,10 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all">
+                      <button 
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all"
+                        onClick={() => setViewTarget(server)}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -242,6 +250,12 @@ export function ServersListTable({ onEdit }: ServersListTableProps) {
         itemName={deleteTarget?.name}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+      {/* View Details Modal */}
+      <ServerDetailsModal
+        open={!!viewTarget}
+        server={viewTarget}
+        onClose={() => setViewTarget(null)}
       />
     </div>
   );

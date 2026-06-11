@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
 import { PageHeader } from '@/components/shared/page-header';
@@ -18,6 +19,9 @@ import { BarChart3, Download } from 'lucide-react';
 import { formatCapacity } from '@/lib/utils';
 
 export default function ReportsPage() {
+  useEffect(() => {
+    document.title = 'Reports | BD CacheX';
+  }, []);
   const { data: companies = [], isLoading: loadingComp } = useSWR<any[]>('/api/companies', fetcher);
   const { data: cacheProviders = [], isLoading: loadingCp } = useSWR<any[]>('/api/cache-providers', fetcher);
   const { data: servers = [], isLoading: loadingSrv } = useSWR<any[]>('/api/servers', fetcher);

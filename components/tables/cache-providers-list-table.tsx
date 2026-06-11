@@ -11,6 +11,7 @@ import { formatDateString, formatCapacity } from '@/lib/utils';
 import { Edit2, Trash2, Eye, Search } from 'lucide-react';
 import { CacheProvider } from '@/lib/types';
 import { toast } from 'sonner';
+import { CacheProviderDetailsModal } from '@/components/shared/cache-provider-details-modal';
 
 import {
   Select,
@@ -28,6 +29,7 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState<CacheProvider | null>(null);
+  const [viewTarget, setViewTarget] = useState<CacheProvider | null>(null);
   
   const { data: providers = [], error, isLoading, mutate } = useSWR<CacheProvider[]>('/api/cache-providers', fetcher);
   
@@ -86,13 +88,14 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
             />
           </div>
           <div className="flex gap-3">
-            <div className="w-[140px]">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <div className="w-[170px]">
+              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value || 'all')}>
                 <SelectTrigger className="bg-slate-50">
-                  <SelectValue placeholder="All Statuses" />
+                  <span className="text-slate-400 mr-1 font-medium">Status:</span>
+                  <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Pending">Pending</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
@@ -125,8 +128,8 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
               <tr className="border-b border-slate-100 bg-slate-50/75 text-xs font-semibold uppercase tracking-wider text-slate-500">
                 <th className="px-6 py-4">Provider Name</th>
                 <th className="px-6 py-4">Short Code</th>
-                <th className="px-6 py-4 text-center">Server Count</th>
-                <th className="px-6 py-4 text-right">Total Capacity</th>
+                <th className="px-6 py-4 text-center">Server Qty</th>
+                <th className="px-6 py-4 text-right">Capacity</th>
                 <th className="px-6 py-4">Description</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Created</th>
@@ -136,17 +139,23 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
             <tbody className="divide-y divide-slate-100 bg-white">
               {filteredProviders.map((provider) => (
                 <tr key={provider.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-slate-800">{provider.name}</td>
+                  <td className="px-6 py-4 font-semibold text-slate-800">
+                    {provider.shortCode} - {provider.name}
+                  </td>
                   <td className="px-6 py-4">
                     <span className="font-mono text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
-                      {provider.shortCode}
+                       {provider.shortCode}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-700 text-center font-medium">
-                    {provider.serverCount ?? 0}
+                    <div className="font-semibold">Total: {provider.serverCount ?? 0}</div>
+                    <div className="text-xs text-slate-500">Used: {provider.usedServerCount ?? 0}</div>
+                    <div className="text-xs text-green-600 font-semibold">Free: {Math.max(0, (provider.serverCount ?? 0) - (provider.usedServerCount ?? 0))}</div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-700 text-right font-semibold">
-                    {formatCapacity(provider.totalCapacity ?? 0)}
+                  <td className="px-6 py-4 text-sm text-slate-700 text-right font-medium">
+                    <div className="font-semibold">Total: {formatCapacity(provider.totalCapacity ?? 0)}</div>
+                    <div className="text-xs text-slate-500">Used: {formatCapacity(provider.usedCapacity ?? 0)}</div>
+                    <div className="text-xs text-green-600 font-semibold">Free: {formatCapacity(Math.max(0, (provider.totalCapacity ?? 0) - (provider.usedCapacity ?? 0)))}</div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     {provider.description || '-'}
@@ -159,7 +168,10 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all">
+                      <button 
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-all"
+                        onClick={() => setViewTarget(provider)}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -191,6 +203,12 @@ export function CacheProvidersListTable({ onEdit }: CacheProvidersListTableProps
         itemName={deleteTarget?.name}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+      {/* View Details Modal */}
+      <CacheProviderDetailsModal
+        open={!!viewTarget}
+        provider={viewTarget}
+        onClose={() => setViewTarget(null)}
       />
     </div>
   );

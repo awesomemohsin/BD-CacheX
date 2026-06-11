@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { AllocationsTable } from '@/components/tables/allocations-table';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,10 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AllocationsPage() {
+  useEffect(() => {
+    document.title = 'Distributions | BD CacheX';
+  }, []);
+
   return (
     <div className="space-y-6">
       <PageHeader

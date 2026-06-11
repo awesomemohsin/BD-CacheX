@@ -17,9 +17,6 @@ export const calculateAvailableCapacity = (used: number, total: number): number 
 
 // Format capacity in GB/TB
 export const formatCapacity = (gb: number): string => {
-  if (gb >= 1024) {
-    return `${(gb / 1024).toFixed(2)} TB`;
-  }
   return `${gb} GB`;
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { ServersListTable } from '@/components/tables/servers-list-table';
 import { ServerModal } from '@/components/shared/server-modal';
@@ -11,6 +11,10 @@ import { Server } from '@/lib/types';
 export default function ServersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedServer, setSelectedServer] = useState<Server | null>(null);
+
+  useEffect(() => {
+    document.title = 'Servers | BD CacheX';
+  }, []);
 
   const handleAddClick = () => {
     setSelectedServer(null);

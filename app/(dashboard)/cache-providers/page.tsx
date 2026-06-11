@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { CacheProvidersListTable } from '@/components/tables/cache-providers-list-table';
 import { CacheProviderModal } from '@/components/shared/cache-provider-modal';
@@ -11,6 +11,10 @@ import { CacheProvider } from '@/lib/types';
 export default function CacheProvidersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<CacheProvider | null>(null);
+
+  useEffect(() => {
+    document.title = 'Cache Providers | BD CacheX';
+  }, []);
 
   const handleAddClick = () => {
     setSelectedProvider(null);
