@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
-import { Allocation } from '@/lib/models/Allocation';
+import { Distribution } from '@/lib/models/Distribution';
 import { Server } from '@/lib/models/Server';
 import { CacheProvider } from '@/lib/models/CacheProvider';
 import { Company } from '@/lib/models/Company';
@@ -8,16 +8,16 @@ import { logActivity } from '@/lib/logging';
 
 async function updateServerUsedCapacity(serverId: any) {
   if (!serverId) return;
-  const allocations = await Allocation.find({ serverId, status: 'Active' });
-  const usedCapacity = allocations.reduce((sum, alloc) => sum + alloc.capacityGB, 0);
+  const distributions = await Distribution.find({ serverId, status: 'Active' });
+  const usedCapacity = distributions.reduce((sum, dist) => sum + dist.capacityGB, 0);
   await Server.findByIdAndUpdate(serverId, { usedCapacityGB: usedCapacity });
 }
 
 async function updateCacheProviderStats(cacheProviderId: any) {
   if (!cacheProviderId) return;
-  const allocations = await Allocation.find({ cacheProviderId, status: 'Active' });
-  const serverCount = allocations.reduce((sum, a) => sum + (a.serverCount || 1), 0);
-  const totalCapacity = allocations.reduce((sum, a) => sum + a.capacityGB, 0);
+  const distributions = await Distribution.find({ cacheProviderId, status: 'Active' });
+  const serverCount = distributions.reduce((sum, d) => sum + (d.serverCount || 1), 0);
+  const totalCapacity = distributions.reduce((sum, d) => sum + d.capacityGB, 0);
   
   await CacheProvider.findByIdAndUpdate(cacheProviderId, {
     serverCount,
@@ -30,23 +30,35 @@ async function updateCacheProviderStats(cacheProviderId: any) {
 export async function GET() {
   try {
     await dbConnect();
-    const allocations = await Allocation.find({})
+    const distributions = await Distribution.find({})
       .populate('companyId')
       .populate('cacheProviderId')
       .populate('serverId')
       .sort({ createdAt: -1 });
 
-    const formatted = allocations.map((alloc: any) => {
-      const json = alloc.toJSON();
+    const formatted = distributions.map((dist: any) => {
+      const json = dist.toJSON();
       return {
         ...json,
-        companyName: alloc.companyId?.name || 'Deleted Company',
-        companyType: alloc.companyId?.type || 'ISP',
-        cacheProviderName: alloc.cacheProviderId?.name || 'Deleted Provider',
-        serverName: alloc.serverId?.name || 'Deleted Server',
-        companyId: alloc.companyId?._id?.toString() || alloc.companyId?.toString() || '',
-        cacheProviderId: alloc.cacheProviderId?._id?.toString() || alloc.cacheProviderId?.toString() || '',
-        serverId: alloc.serverId?._id?.toString() || alloc.serverId?.toString() || '',
+        companyName: dist.companyId?.name || 'Deleted Company',
+        companyType: dist.companyId?.type || 'ISP',
+        cacheProviderName: dist.cacheProviderId?.name || 'Deleted Provider',
+        serverName: dist.serverId?.name || 'Deleted Server',
+        companyId: dist.companyId?._id?.toString() || dist.companyId?.toString() || '',
+        cacheProviderId: dist.cacheProviderId?._id?.toString() || dist.cacheProviderId?.toString() || '',
+        serverId: dist.serverId?._id?.toString() || dist.serverId?.toString() || '',
+        company: dist.companyId && typeof dist.companyId === 'object' ? {
+          ...dist.companyId.toJSON(),
+          id: dist.companyId._id.toString()
+        } : undefined,
+        cacheProvider: dist.cacheProviderId && typeof dist.cacheProviderId === 'object' ? {
+          ...dist.cacheProviderId.toJSON(),
+          id: dist.cacheProviderId._id.toString()
+        } : undefined,
+        server: dist.serverId && typeof dist.serverId === 'object' ? {
+          ...dist.serverId.toJSON(),
+          id: dist.serverId._id.toString()
+        } : undefined,
       };
     });
 
@@ -66,7 +78,7 @@ export async function POST(request: Request) {
     const startOfDay = new Date(goLiveDate.getFullYear(), goLiveDate.getMonth(), goLiveDate.getDate());
     const endOfDay = new Date(goLiveDate.getFullYear(), goLiveDate.getMonth(), goLiveDate.getDate(), 23, 59, 59, 999);
 
-    const duplicate = await Allocation.findOne({
+    const duplicate = await Distribution.findOne({
       serverId: body.serverId,
       capacityGB: Number(body.capacityGB),
       goLiveDate: {
@@ -96,9 +108,9 @@ export async function POST(request: Request) {
     const compName = company ? company.name : 'Unknown';
     const srvName = server ? server.name : 'Unknown';
     const details = `Allocated ${body.capacityGB} GB from ${cpName} to ${compName} on server ${srvName}`;
-    const userEmail = await logActivity(request, 'CREATE', 'Allocation', details);
+    const userEmail = await logActivity(request, 'CREATE', 'Distribution', details);
     
-    const allocation = await Allocation.create({
+    const distribution = await Distribution.create({
       companyId: body.companyId,
       cacheProviderId: body.cacheProviderId,
       serverId: body.serverId,
@@ -114,7 +126,7 @@ export async function POST(request: Request) {
     await updateServerUsedCapacity(body.serverId);
     await updateCacheProviderStats(body.cacheProviderId);
 
-    return NextResponse.json({ success: true, data: allocation }, { status: 201 });
+    return NextResponse.json({ success: true, data: distribution }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }

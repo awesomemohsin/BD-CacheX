@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Allocation, StatusType, CompanyType } from '@/lib/types';
+import { Distribution, StatusType, CompanyType } from '@/lib/types';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
@@ -17,21 +17,21 @@ import {
 import { Loader2, ChevronDown, Search, Check } from 'lucide-react';
 import { cn, formatCapacity } from '@/lib/utils';
 
-interface FormState extends Omit<Partial<Allocation>, 'goLiveDate'> {
+interface FormState extends Omit<Partial<Distribution>, 'goLiveDate'> {
   goLiveDate: string;
 }
 
-interface AllocationFormProps {
-  initialData?: Allocation;
-  onSubmit: (data: Partial<Allocation>) => void;
+interface DistributionFormProps {
+  initialData?: Distribution;
+  onSubmit: (data: Partial<Distribution>) => void;
   isLoading?: boolean;
 }
 
-export function AllocationForm({
+export function DistributionForm({
   initialData,
   onSubmit,
   isLoading = false,
-}: AllocationFormProps) {
+}: DistributionFormProps) {
   const { data: companies = [], isLoading: loadingComp } = useSWR<any[]>('/api/companies', fetcher);
   const { data: cacheProviders = [], isLoading: loadingCp } = useSWR<any[]>('/api/cache-providers', fetcher);
   const { data: servers = [], isLoading: loadingSrv } = useSWR<any[]>('/api/servers', fetcher);
@@ -274,7 +274,7 @@ export function AllocationForm({
         )}
         
         {errors.companyId && (
-          <p className="text-xs text-red-650">{errors.companyId}</p>
+          <p className="text-xs text-red-655">{errors.companyId}</p>
         )}
       </div>
 
