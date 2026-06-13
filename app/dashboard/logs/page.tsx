@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/shared/empty-state';
 import { formatDateTime } from '@/lib/utils';
-import { Search, Eye, History, RefreshCw } from 'lucide-react';
+import { Search, History, RefreshCw } from 'lucide-react';
 import { ActivityLog } from '@/lib/types';
 
 export default function ActivityLogsPage() {

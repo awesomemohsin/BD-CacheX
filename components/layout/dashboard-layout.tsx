@@ -13,6 +13,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // 1. Guard route by verifying localStorage credentials
     if (typeof window !== 'undefined') {
+      // Developer trace
+      console.log(
+        '%cDeveloped by Md. Mohsin%c\nPortfolio: https://md-mohsin.vercel.app/\nGitHub: https://github.com/awesomemohsin',
+        'font-weight: bold; font-size: 14px; color: #2563eb;',
+        'font-size: 11px; color: #64748b;'
+      );
+
       const email = localStorage.getItem('user-email');
       if (!email) {
         router.push('/login');

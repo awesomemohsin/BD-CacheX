@@ -15,6 +15,11 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.png',
   },
+  other: {
+    developer: 'Md. Mohsin',
+    'developer-portfolio': 'https://md-mohsin.vercel.app/',
+    'developer-github': 'https://github.com/awesomemohsin',
+  },
 }
 
 export default function RootLayout({
