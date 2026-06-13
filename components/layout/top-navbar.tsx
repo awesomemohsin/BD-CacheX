@@ -105,45 +105,6 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-4 ml-auto">
-          {/* Notifications */}
-          <DropdownMenu onOpenChange={(open) => { if (open) setUnreadCount(0); }}>
-            <DropdownMenuTrigger
-              render={
-                <button className="relative p-2 text-slate-650 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                  <Bell className="w-5 h-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                  )}
-                </button>
-              }
-            />
-            <DropdownMenuContent align="end" className="w-80 p-2 bg-white border border-slate-200 shadow-xl rounded-xl">
-              <DropdownMenuLabel className="text-slate-800 font-bold text-sm px-2 py-1">Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <div className="space-y-1">
-                {mockNotifications.map((notif) => (
-                  <DropdownMenuItem key={notif.id} className="flex flex-col items-start gap-1 p-2 rounded-lg hover:bg-slate-50 cursor-pointer focus:bg-slate-50">
-                    <div className="flex items-center gap-2 w-full">
-                      <span className={`w-2 h-2 rounded-full shrink-0 ${
-                        notif.type === 'critical' ? 'bg-red-500 animate-pulse' :
-                        notif.type === 'info' ? 'bg-blue-500' : 'bg-green-500'
-                      }`} />
-                      <span className="text-xs font-semibold text-slate-800 flex-1 leading-normal">
-                        {notif.message}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-medium pl-4">{notif.time}</span>
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Settings */}
-          <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)} className="cursor-pointer">
-            <Settings className="w-5 h-5" />
-          </Button>
-
           {/* User Button */}
           <button
             onClick={() => setIsProfileOpen(true)}
