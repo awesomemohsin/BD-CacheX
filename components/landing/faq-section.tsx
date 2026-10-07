@@ -29,7 +29,7 @@ export function LandingFaq() {
     },
     {
       q: 'How can I test the system or get BD CacheX deployed for my ISP?',
-      a: 'You can explore the live working platform right now by clicking "Dashboard" in the top bar. To discuss deploying BD CacheX on your network or getting tailored hardware sizing, contact lead architect Md. Mohsin directly via WhatsApp (+880 1958-113265), Facebook, or through the direct contact hub below.',
+      a: 'You can explore the live working platform right now by clicking "Dashboard" in the top bar. To discuss deploying BD CacheX on your network or getting tailored hardware sizing, contact lead architect Md. Mohsin directly via WhatsApp (+880 1881-169880), Facebook, or through the direct contact hub below.',
     },
   ];
 

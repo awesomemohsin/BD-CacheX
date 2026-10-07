@@ -80,13 +80,13 @@ export function LandingHero() {
             </Link>
 
             <a
-              href="https://wa.me/8801958113265"
+              href="https://wa.me/+8801881169880"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0"
             >
               <MessageCircle className="w-4 h-4 fill-current shrink-0" />
-              <span className="whitespace-nowrap">WhatsApp: +880 1958-113265</span>
+              <span className="whitespace-nowrap">WhatsApp: +880 1881-169880</span>
             </a>
           </div>
 
@@ -115,7 +115,7 @@ export function LandingHero() {
               {/* Direct Quick Badges */}
               <div className="flex items-center gap-2 shrink-0">
                 <a
-                  href="https://wa.me/8801958113265"
+                  href="https://wa.me/+8801881169880"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-[11px] font-semibold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"

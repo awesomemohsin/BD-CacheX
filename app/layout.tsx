@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   other: {
     developer: 'Md. Mohsin',
     'developer-portfolio': 'https://md-mohsin.vercel.app/',
-    'developer-whatsapp': 'https://wa.me/8801958113265',
+    'developer-whatsapp': 'https://wa.me/+8801881169880',
     'developer-facebook': 'https://www.facebook.com/muhammad.mohsin.0033/',
   },
 }

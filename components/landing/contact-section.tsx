@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 
 export function LandingContact() {
-  const whatsappNumber = '+880 1958-113265';
-  const whatsappUrl = 'https://wa.me/8801958113265';
+  const whatsappNumber = '+880 1881-169880';
+  const whatsappUrl = 'https://wa.me/+8801881169880';
 
   const quickInquiries = [
     {
@@ -198,7 +198,7 @@ export function LandingContact() {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 transition-all transform hover:-translate-y-0.5 shrink-0 whitespace-nowrap"
             >
               <MessageCircle className="w-4 h-4 fill-current shrink-0" />
-              <span>Chat Now (+880 1958-113265)</span>
+              <span>Chat Now (+880 1881-169880)</span>
             </a>
           </div>
 
@@ -206,7 +206,7 @@ export function LandingContact() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6">
             {quickInquiries.map((item, idx) => {
               const Icon = item.icon;
-              const link = `https://wa.me/8801958113265?text=${encodeURIComponent(item.text)}`;
+              const link = `${whatsappUrl}?text=${encodeURIComponent(item.text)}`;
               return (
                 <a
                   key={idx}

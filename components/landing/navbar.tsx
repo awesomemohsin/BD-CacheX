@@ -76,14 +76,14 @@ export function LandingNavbar() {
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-2 shrink-0">
             <a
-              href="https://wa.me/8801958113265"
+              href="https://wa.me/+8801881169880"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 transition-all shadow-xs whitespace-nowrap shrink-0"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">WhatsApp: +880 1958-113265</span>
+              <span className="whitespace-nowrap">WhatsApp: +880 1881-169880</span>
             </a>
 
             <a
@@ -116,7 +116,7 @@ export function LandingNavbar() {
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2 shrink-0">
             <a
-              href="https://wa.me/8801958113265"
+              href="https://wa.me/+8801881169880"
               target="_blank"
               rel="noopener noreferrer"
               className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-300"
@@ -159,13 +159,13 @@ export function LandingNavbar() {
 
           <div className="flex flex-col gap-2 pt-2">
             <a
-              href="https://wa.me/8801958113265"
+              href="https://wa.me/+8801881169880"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300 whitespace-nowrap"
             >
               <MessageCircle className="w-4 h-4 shrink-0" />
-              <span>Chat on WhatsApp (+880 1958-113265)</span>
+              <span>Chat on WhatsApp (+880 1881-169880)</span>
             </a>
             <div className="grid grid-cols-2 gap-2">
               <Link

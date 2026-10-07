@@ -265,7 +265,7 @@ export function LandingRoiCalculator() {
               {/* Direct Instant Action Buttons */}
               <div className="grid grid-cols-2 gap-2">
                 <a
-                  href={`https://wa.me/8801958113265?text=${encodeURIComponent(`Hello Mohsin, I checked the BD CacheX ROI calculator for ${bandwidthGbps} Gbps traffic and estimated ${formatMoney(monthlySavings)} monthly savings. I'd like to discuss deployment for my network.`)}`}
+                  href={`https://wa.me/+8801881169880?text=${encodeURIComponent(`Hello Mohsin, I checked the BD CacheX ROI calculator for ${bandwidthGbps} Gbps traffic and estimated ${formatMoney(monthlySavings)} monthly savings. I'd like to discuss deployment for my network.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all text-center whitespace-nowrap"

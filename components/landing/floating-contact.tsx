@@ -47,14 +47,14 @@ export function FloatingContactBar() {
           <div className="space-y-2 text-xs">
             {/* WhatsApp */}
             <a
-              href="https://wa.me/8801958113265"
+              href="https://wa.me/+8801881169880"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 transition-all font-bold"
             >
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp: +880 1958-113265</span>
+                <span>WhatsApp: +880 1881-169880</span>
               </div>
               <ExternalLink className="w-3.5 h-3.5 opacity-70" />
             </a>
@@ -95,13 +95,13 @@ export function FloatingContactBar() {
       {/* Main Floating Trigger Button */}
       <div className="flex items-center gap-2">
         <a
-          href="https://wa.me/8801958113265"
+          href="https://wa.me/+8801881169880"
           target="_blank"
           rel="noopener noreferrer"
           className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap shrink-0"
         >
           <MessageCircle className="w-4 h-4 fill-current shrink-0" />
-          <span className="whitespace-nowrap">WhatsApp: +880 1958-113265</span>
+          <span className="whitespace-nowrap">WhatsApp: +880 1881-169880</span>
         </a>
 
         <button

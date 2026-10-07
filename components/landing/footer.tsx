@@ -37,7 +37,7 @@ export function LandingFooter() {
 
             <div className="flex items-center gap-3 pt-2">
               <a
-                href="https://wa.me/8801958113265"
+                href="https://wa.me/+8801881169880"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-300 transition-colors shadow-xs"
@@ -112,13 +112,13 @@ export function LandingFooter() {
             <ul className="space-y-2.5">
               <li>
                 <a 
-                  href="https://wa.me/8801958113265" 
+                  href="https://wa.me/+8801881169880" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:text-emerald-700 transition-colors flex items-center gap-1 font-mono font-bold text-emerald-700"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
-                  WhatsApp: +880 1958-113265
+                  WhatsApp: +880 1881-169880
                 </a>
               </li>
               <li>
