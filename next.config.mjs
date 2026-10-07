@@ -15,10 +15,6 @@ const nextConfig = {
             key: 'X-Developer',
             value: 'Md. Mohsin (https://md-mohsin.vercel.app/)',
           },
-          {
-            key: 'X-Developer-GitHub',
-            value: 'https://github.com/awesomemohsin',
-          },
         ],
       },
     ];
