@@ -28,8 +28,8 @@ export function LandingNavbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/90 shadow-sm shadow-slate-200/50 py-3'
-          : 'bg-white/70 backdrop-blur-md py-4'
+          ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200/90 shadow-sm shadow-slate-200/40 py-2.5'
+          : 'bg-white/65 backdrop-blur-lg border-b border-blue-100/50 py-3.5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
